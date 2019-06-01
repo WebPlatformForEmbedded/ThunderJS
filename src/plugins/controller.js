@@ -2,11 +2,11 @@
  * Controller is responsible for starting/stopping plugins
  */
 
-import { JsonRPC } from '../lib/jsonrpc.js'
+import { BasePlugin } from '../lib/base.js'
 
-export class Controller extends JsonRPC {
-	constructor(host) {
-		super(host)
+export class Controller extends BasePlugin {
+	constructor(host, api) {
+		super(host, api)
 		this._namespace = 'Controller.1.'
 	}
 

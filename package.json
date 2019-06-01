@@ -5,6 +5,8 @@
   "license": "apache",
   "main": "src/thunder.js",
   "scripts": {
+    "install-tests": "npm install && cd tests && npm install",
+    "test": "node ./tests",
     "postinstall": "rollup -c"
   },
   "dependencies": {
