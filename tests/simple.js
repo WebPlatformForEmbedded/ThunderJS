@@ -17,6 +17,10 @@ t.on('onopen', () => {
 		console.error('Oops', err)
 	})
 
+	controller.on('statechange', (event) => {
+		console.log('controller statechange: ', event)
+	})
+	
 	let deviceInfo = t.getService('DeviceInfo')
 
 	console.log('got DeviceInfo', deviceInfo)

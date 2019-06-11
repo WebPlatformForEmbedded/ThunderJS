@@ -5,10 +5,12 @@ export class JsonRPC extends EventEmitter {
 	constructor(host) {
         super()
 
+        this._callbackQueue = {}
 		this._host = host
 		this._id = 0
+        this._notificationId = 0
+        this._notificationCallbackQueue = {}
 		this._socket = undefined
-		this._callbackQueue = {}
 		this._services = {}
 
         this._connected = false
@@ -30,11 +32,18 @@ export class JsonRPC extends EventEmitter {
                 if (!data)
                     return
 
-                var id = data.id
-                if (self._callbackQueue[id]){
+                // normal jsonrpc message
+                if (data.id && self._callbackQueue[data.id]){
                     self._callbackQueue[data.id](data.error, data.result);
-                    delete self._callbackQueue[data.id]
+                    return delete self._callbackQueue[data.id]
                 }
+
+                // notification
+                // notifications are without id on the json rpc object, however Thunder provides an event id on the params
+                // check if that is present and if we have that id in the _notificationCallbackQueue, then call it
+                if (!data.id && data.method && data.params && data.params.id && self._notificationCallbackQueue[ data.params.id ])
+                    self._notificationCallbackQueue[ data.params.id ](data.method, data.params)
+
             } catch (e) {
                 return console.error('socket error', e)
             }
@@ -83,6 +92,18 @@ export class JsonRPC extends EventEmitter {
                 this._id++
             }
         })
+    }
+
+    registerNotification(plugin, event, callback) {
+        this._notificationId++
+        this._notificationCallbackQueue[ this._notificationId ] = callback
+
+        this.req(`${plugin}register`, { 'event': event, id: `event.${this._notificationId}`})
+        return this._notificationId
+    }
+
+    unregisterNotification(id) {
+        return delete this._notificationCallbackQueue[ id ]
     }
 
     req(method, params){

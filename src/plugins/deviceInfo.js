@@ -2,7 +2,7 @@
  * DeviceInfo plugin provides system information
  */
 
-import { BasePlugin } from '../lib/base.js'
+import { BasePlugin } from './base.js'
 
 export class DeviceInfo extends BasePlugin {
 	constructor(host, api) {
