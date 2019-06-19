@@ -1,9 +1,0 @@
-{
-  "name": "thunderjs-cli",
-  "version": "0.0.1",
-  "author": "Wouter <wouter@metrological.com",
-  "dependencies": {
-    "esm": "^3.2.22",
-    "websocket": "^1.0.28"
-  }
-}

@@ -5,12 +5,22 @@
   "license": "apache",
   "main": "src/thunder.js",
   "scripts": {
-    "install-tests": "npm install && cd tests && npm install",
-    "test": "node ./tests",
-    "postinstall": "rollup -c"
+    "start": "concurrently \"npm run server\" \"npm run examples\"",
+    "server": "node -r esm server/index.js",
+    "examples": "node -r esm examples/index.js",
+    "lint": "eslint '**/*.{js}'",
+    "lint:fix": "eslint '**/*.{js}' --fix"
   },
-  "dependencies": {
-    "rollup": "^0.67.0"
+  "lint-staged": {
+    "*.{js}": [
+      "npm run lint:fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "repository": {
     "type": "git",
@@ -18,5 +28,20 @@
   },
   "bugs": {
     "url": "https://github.com/WebPlatformForEmbedded/ThunderJS/issues"
+  },
+  "dependencies": {
+    "babel-eslint": "^10.0.1",
+    "chalk": "^2.4.2",
+    "concurrently": "^4.1.0",
+    "contra": "^1.9.4",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "esm": "^3.2.25",
+    "husky": "^2.4.1",
+    "isomorphic-ws": "^4.0.1",
+    "lint-staged": "^8.2.1",
+    "prettier": "^1.18.2",
+    "ws": "^7.0.1"
   }
 }
