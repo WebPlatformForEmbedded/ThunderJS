@@ -9,6 +9,21 @@ export default (options) => {
 }
 
 const resolve = (result, args) => {
+  // make sure we always have a promise
+  if (
+    // not an object so definitely not a promise
+    typeof result !== 'object' ||
+    // an object that doesn't look like a promise
+    (typeof result === 'object' && (!result.then || typeof result.then !== 'function'))
+
+  ) {
+
+    result = new Promise((resolve, reject) => {
+      result instanceof Error === false ? resolve(result) : reject(result)
+    })
+  }
+
+
   // see if the last argument is a function (and assume it's the callback)
   const cb = typeof args[args.length - 1] === 'function' ? args[args.length - 1] : null
   if (cb) {

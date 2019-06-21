@@ -132,20 +132,40 @@ test('thunderJS - response - promise', assert => {
     value() {
       return 'hello!'
     },
+    object() {
+      return { hi: 'there' }
+    },
+    err() {
+      return new Error('this is an error')
+    },
   })
 
   // call promise method and see if it has a then function (as promises do)
   let actual = thunderJS.custom.promise().then
   assert.ok(actual, 'Calls on thunderJS should return a promise')
 
-  // Todo:
-
   // call value method and see if it has a then function (as promises do)
-  // actual = thunderJS.custom.value().then
-  // assert.ok(
-  //   actual,
-  //   'Calls on thunderJS should return a promise (even if the method only returns a value)'
-  // )
+  actual = thunderJS.custom.value().then
+  assert.ok(
+    actual,
+    'Calls on thunderJS should return a promise (even if the method only returns a value)'
+  )
+
+  actual = thunderJS.custom.object().then
+  assert.ok(
+    actual,
+    'Calls on thunderJS should return a promise (even if the method returns an object literal)'
+  )
+
+  let result = thunderJS.custom.err()
+  actual = result.then
+  // handle the error properly
+  result.catch(err => {})
+
+  assert.ok(
+    actual,
+    'Calls on thunderJS should return a promise (even if the method returns an Error)'
+  )
 
   assert.end()
 })
