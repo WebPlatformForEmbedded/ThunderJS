@@ -129,3 +129,9 @@ thunderJS.custom.method1()
   .then(console.log)
   .catch(console.error)
 ```
+
+## Running tests
+
+This library has a handful of unit / integration tests, located in the `tests` folder.
+
+To run all the tests execute: `npm test`
