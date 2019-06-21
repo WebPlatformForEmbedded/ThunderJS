@@ -5,6 +5,7 @@
   "license": "apache",
   "main": "src/thunder.js",
   "scripts": {
+    "test": "tape -r esm tests/**/*.spec.js | tap-diff",
     "start": "concurrently \"npm run server\" \"npm run examples\"",
     "server": "node -r esm server/index.js",
     "examples": "node -r esm examples/index.js",
@@ -42,6 +43,9 @@
     "isomorphic-ws": "^4.0.1",
     "lint-staged": "^8.2.1",
     "prettier": "^1.18.2",
+    "sinon": "^7.3.2",
+    "tap-diff": "^0.1.1",
+    "tape": "^4.10.2",
     "ws": "^7.0.1"
   }
 }
