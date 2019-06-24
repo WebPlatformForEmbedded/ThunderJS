@@ -20,7 +20,7 @@ The goal of ThunderJS is to
 
 ### Initializing the library
 
-```
+```js
 import ThunderJS from './thunderJS' // or const ThunderJS = require('./thunderJS')
 
 const thunderJS = ThunderJS({ host: 'localhost:3030' })
@@ -38,21 +38,23 @@ The library supports 2 ways of making API calls, depending on your coding style 
 
 **Option 1 - Argument based**
 
-```
+```js
 const plugin = 'device'
 const method = 'systeminfo'
 const params = {
   foo: 'bar'
 }
+
 thunderJS.call(plugin, method, params)
 ```
 
 **Option 2 - Object based**
 
-```
+```js
 const params = {
   foo: 'bar'
 }
+
 thunderJS.device.systeminfo(params)
 ```
 
@@ -64,7 +66,7 @@ The library supports 2 ways of processing the results of API calls, depending on
 
 **Option 1 - Promise based**
 
-```
+```js
 thunderJS.device.systeminfo()
   .then(result => {
     console.log('Success!', result)
@@ -75,7 +77,7 @@ thunderJS.device.systeminfo()
 
 **Option 2 - Callback based**
 
-```
+```js
 thunderJS.device.systeminfo((err, result) => {
   if(err) {
     console.error('Error', err)
@@ -96,7 +98,7 @@ For example, the WPE Thunder API for the `device` plugin consists of only 3 meth
 
 On top of that the ThunderJS library implements 2 convenience methods to retrieve the `version` and `freeRam` directly (which ultimately are retrieved from the API by calling the `systeminfo` method).
 
-```
+```js
 thunderJS.device
   .freeRam()
   .then(ram => {
@@ -111,7 +113,7 @@ thunderJS.device
 
 You can easily implement custom plugins. A plugin consists of a plain JS object literal, that should be registered under the plugin's namespace.
 
-```
+```js
 // register the plugin
 thunderJS.registerPlugin('custom', {
   method1() {
@@ -136,7 +138,7 @@ thunderJS.custom.method1()
 
 The simplest way to listen to and act upon a notification:
 
-```
+```js
 const listener = thunderJS.on('controller', 'statechange', (event) => {
   console.log('Execute this callback on every notification', event)
 })
@@ -146,7 +148,7 @@ listener.dispose()
 ```
 
 Or if you want to listen only once
-```
+```js
 const listener = thunderJS.once('controller', 'statechange', (event) => {
   console.log('Execute this callback once', event)
 })
@@ -157,13 +159,13 @@ listener.dispose()
 
 As with API calls, you can also use *object based* style to achieve the same result.
 
-```
+```js
 const listener = thunderJS.controller.on('statechange', (event) => {
   console.log('Execute this callback on every notification', event)
 })
 ```
 
-```
+```js
 const listener = thunderJS.controller.once('statechange', (event) => {
   console.log('Execute this callback once', event)
 })
@@ -171,7 +173,7 @@ const listener = thunderJS.controller.once('statechange', (event) => {
 
 You can attach multiple callbacks (listeners) to the same notification. They will be executed in sequence.
 
-```
+```js
 const listener1 = thunderJS.controller.on('statechange', (event) => {
   console.log('First callback!', event)
 })
@@ -183,7 +185,7 @@ const listener2 = thunderJS.controller.on('statechange', (event) => {
 
 If you want / need more control - for example because you need multiple listeners and want to keep track of them - you could also create a _subscription_.
 
-```
+```js
 const subscription = thunderJS.subscribe('controller') // or thunderJS.controller.subscribe()
 
 const listener = subscription.on('statechange', (event) => {
