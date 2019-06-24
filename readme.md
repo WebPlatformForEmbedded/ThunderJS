@@ -130,6 +130,89 @@ thunderJS.custom.method1()
   .catch(console.error)
 ```
 
+### Notifications
+
+**Proposal - work in progress**
+
+The simplest way to listen to and act upon a notification:
+
+```
+const listener = thunderJS.on('controller', 'statechange', (event) => {
+  console.log('Execute this callback on every notification', event)
+})
+
+// dispose when done listening
+listener.dispose()
+```
+
+Or if you want to listen only once
+```
+const listener = thunderJS.once('controller', 'statechange', (event) => {
+  console.log('Execute this callback once', event)
+})
+
+// a once-listener can be disposed (before it's called, of course)
+listener.dispose()
+```
+
+As with API calls, you can also use *object based* style to achieve the same result.
+
+```
+const listener = thunderJS.controller.on('statechange', (event) => {
+  console.log('Execute this callback on every notification', event)
+})
+```
+
+```
+const listener = thunderJS.controller.once('statechange', (event) => {
+  console.log('Execute this callback once', event)
+})
+```
+
+You can attach multiple callbacks (listeners) to the same notification. They will be executed in sequence.
+
+```
+const listener1 = thunderJS.controller.on('statechange', (event) => {
+  console.log('First callback!', event)
+})
+
+const listener2 = thunderJS.controller.on('statechange', (event) => {
+  console.log('Second callback!', event)
+})
+```
+
+If you want / need more control - for example because you need multiple listeners and want to keep track of them - you could also create a _subscription_.
+
+```
+const subscription = thunderJS.subscribe('controller') // or thunderJS.controller.subscribe()
+
+const listener = subscription.on('statechange', (event) => {
+  console.log('Execute this callback on every notification', event)
+})
+
+const listenerOnce = subscription.once('statechange', (event) => {
+  console.log('Execute this callback on time', event)
+})
+
+// dispose listener when done listening
+listener.dispose()
+
+// return all listeners
+const listeners = subscription.listeners()
+
+// dispose all listeners
+subscription.disposeAll()
+
+// unsubscribe the subscription to stop acting upon incoming notifications (but keep track of the listeners!)
+subscription.unsubscribe()
+
+// subscribe to the notifications again (activating all listeners that weren't disposed of)
+subscription.subscribe()
+
+// dispose the subscription (together with all listeners)
+subscription.dispose()
+```
+
 ## Running tests
 
 This library has a handful of unit / integration tests, located in the `tests` folder.
