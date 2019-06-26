@@ -55,18 +55,19 @@ const thunder = {
       return api.request.apply(this, args)
 
     },
+    registerPlugin(name, plugin) {
+        this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
+    },
     subscribe() {
       // subscribe to notification
       // to do
     },
-    unsubscribe() {
-      // unsubscribe from notification
-      // to do
+    on() {
+      return listener()
     },
-    registerPlugin(name, plugin) {
-        this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
-    }
-
+    once() {
+      return listener()
+    },
 }
 
 const wrapper = obj => {
@@ -75,6 +76,12 @@ const wrapper = obj => {
       const prop = target[propKey]
       if (typeof prop !== 'undefined') {
         if(typeof prop === 'function') {
+          // on, once and subscribe don't need to be wrapped in a resolve
+          if(['on', 'once', 'subscribe'].indexOf(propKey) > -1) {
+            return function(...args) {
+              return prop.apply(this, args)
+            }
+          }
           return function(...args) {
             return resolve(prop.apply(this, args), args)
           }
