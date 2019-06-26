@@ -1,5 +1,6 @@
 import API from './api'
 import plugins from './plugins'
+import listener from './listener'
 
 let api
 
@@ -36,17 +37,19 @@ const resolve = (result, args) => {
 const thunder = {
     plugin: false,
     call() {
-      // little trick to set the plugin name when calling from a plugin context
+      // little trick to set the plugin name when calling from a plugin context (if not already set)
       const args = [...arguments]
       if(this.plugin) {
-        args.unshift(this.plugin)
+        args[0] !== this.plugin ? args.unshift(this.plugin) : null
       }
       // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
       else {
         const plugin = args[0]
-        const method = args[1]
-        delete args[0]
-        return this[plugin][method](args)
+        this.plugin = plugin
+      }
+      const method = args[1]
+      if(typeof this[this.plugin][method] == 'function') {
+        return this[this.plugin][method](args)
       }
 
       return api.request.apply(this, args)
@@ -81,6 +84,9 @@ const wrapper = obj => {
         }
         return prop
       } else {
+        if(target.plugin === false) {
+          return wrapper(Object.assign(Object.create(thunder), {}, {plugin: propKey}))
+        }
         return function(...args) {
           args.unshift(propKey)
           return target.call.apply(this, args)
