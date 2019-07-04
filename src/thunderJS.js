@@ -6,7 +6,7 @@ let api
 
 export default (options) => {
   api = API(options.host)
-  return wrapper({...thunder, ...plugins})
+  return wrapper({...thunder, ...plugins, ...{api}})
 }
 
 const resolve = (result, args) => {
@@ -52,7 +52,7 @@ const thunder = {
       return this[this.plugin][method](args)
     }
 
-    return api.request.apply(this, args)
+    return this.api.request.apply(this, args)
 
   },
   registerPlugin(name, plugin) {
@@ -63,6 +63,7 @@ const thunder = {
     // to do
   },
   on() {
+    console.log('on???')
     return listener()
   },
   once() {
