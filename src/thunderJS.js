@@ -35,39 +35,39 @@ const resolve = (result, args) => {
 }
 
 const thunder = {
-    plugin: false,
-    call() {
-      // little trick to set the plugin name when calling from a plugin context (if not already set)
-      const args = [...arguments]
-      if(this.plugin) {
-        args[0] !== this.plugin ? args.unshift(this.plugin) : null
-      }
-      // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
-      else {
-        const plugin = args[0]
-        this.plugin = plugin
-      }
-      const method = args[1]
-      if(typeof this[this.plugin][method] == 'function') {
-        return this[this.plugin][method](args)
-      }
+  plugin: false,
+  call() {
+    // little trick to set the plugin name when calling from a plugin context (if not already set)
+    const args = [...arguments]
+    if(this.plugin) {
+      args[0] !== this.plugin ? args.unshift(this.plugin) : null
+    }
+    // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
+    else {
+      const plugin = args[0]
+      this.plugin = plugin
+    }
+    const method = args[1]
+    if(typeof this[this.plugin][method] == 'function') {
+      return this[this.plugin][method](args)
+    }
 
-      return api.request.apply(this, args)
+    return api.request.apply(this, args)
 
-    },
-    registerPlugin(name, plugin) {
-        this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
-    },
-    subscribe() {
-      // subscribe to notification
-      // to do
-    },
-    on() {
-      return listener()
-    },
-    once() {
-      return listener()
-    },
+  },
+  registerPlugin(name, plugin) {
+      this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
+  },
+  subscribe() {
+    // subscribe to notification
+    // to do
+  },
+  on() {
+    return listener()
+  },
+  once() {
+    return listener()
+  },
 }
 
 const wrapper = obj => {
