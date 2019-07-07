@@ -2,11 +2,13 @@ import API from './api'
 import plugins from './plugins'
 import listener from './listener'
 
+const defaultVersion = 1
+
 let api
 
 export default (options) => {
   api = API(options.host)
-  return wrapper({...thunder, ...plugins})
+  return wrapper({...thunder(options), ...plugins})
 }
 
 const resolve = (result, args) => {
@@ -34,7 +36,8 @@ const resolve = (result, args) => {
   }
 }
 
-const thunder = {
+const thunder = (options) => ({
+    options,
     plugin: false,
     call() {
       // little trick to set the plugin name when calling from a plugin context (if not already set)
@@ -52,6 +55,9 @@ const thunder = {
         return this[this.plugin][method](args)
       }
 
+      // merge in the version
+      args.splice(1,0, getVersion(options.versions, this.plugin))
+
       return api.request.apply(this, args)
 
     },
@@ -68,7 +74,7 @@ const thunder = {
     once() {
       return listener()
     },
-}
+})
 
 const wrapper = obj => {
   return new Proxy(obj, {
@@ -87,12 +93,12 @@ const wrapper = obj => {
           }
         }
         if(typeof prop === 'object') {
-          return wrapper(Object.assign(Object.create(thunder), prop, {plugin: propKey}))
+          return wrapper(Object.assign(Object.create(thunder(target.options)), prop, {plugin: propKey}))
         }
         return prop
       } else {
         if(target.plugin === false) {
-          return wrapper(Object.assign(Object.create(thunder), {}, {plugin: propKey}))
+          return wrapper(Object.assign(Object.create(thunder(target.options)), {}, {plugin: propKey}))
         }
         return function(...args) {
           args.unshift(propKey)
@@ -101,4 +107,9 @@ const wrapper = obj => {
       }
     },
   })
+}
+
+
+const getVersion = (versions, plugin) => {
+  return versions ? (versions[plugin] || versions.default || defaultVersion) : {}
 }

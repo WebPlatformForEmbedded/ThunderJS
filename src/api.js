@@ -50,13 +50,13 @@ export default host => {
   }
 
   return {
-    request(plugin, method, params) {
+    request(plugin, version, method, params) {
       return new Promise((resolve, reject) => {
         const requestId = getId()
         const body = {
           jsonrpc: '2.0',
           id: requestId,
-          method: [plugin, method].join('.'),
+          method: [plugin, version, method].join('.'),
           params: params || {},
         }
 

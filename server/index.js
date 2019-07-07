@@ -10,8 +10,10 @@ websocket.on('connection', function(ws) {
   ws.on('message', function(message) {
     const input = JSON.parse(message)
 
-    const plugin = input.method.split('.').shift()
-    const method = input.method.split('.').pop()
+    const fullMethod = input.method.split('.')
+    const plugin = fullMethod[0]
+    const version = fullMethod[1]
+    const method = fullMethod[2]
 
     const body = {
       jsonrpc: '2.0',
@@ -19,7 +21,7 @@ websocket.on('connection', function(ws) {
     }
     // fake output, usually a success response, sometimes an error
     Math.random() >= 0.3
-      ? (body.result = API(plugin, method))
+      ? (body.result = API(plugin, version, method))
       : (body.error = 'Oops .. something went wrong')
 
     // simulate latency with a random timeout
