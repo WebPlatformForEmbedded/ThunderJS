@@ -16,14 +16,17 @@ A flexible and extensible JS library to interact with WPE Thunder.
 
 The goal of ThunderJS is to
 1) make API calls to the WPE Thunder back-end and
-2) listen to (and act upon) notifications broadcasted by the back-end (todo).
+2) listen to (and act upon) notifications broadcasted by the back-end (wip).
 
 ### Initializing the library
 
 ```js
 import ThunderJS from './thunderJS' // or const ThunderJS = require('./thunderJS')
 
-const thunderJS = ThunderJS({ host: 'localhost:3030' })
+const config = {
+  host: 'localhost:3030',
+}
+const thunderJS = ThunderJS(config)
 ```
 
 ### Making API calls
@@ -56,6 +59,30 @@ const params = {
 }
 
 thunderJS.device.systeminfo(params)
+```
+
+**Versions**
+
+The API supports different versions of the same methods, with a slightly different implementation depending on the specific STB.
+
+By default ThunderJS calls *version 1* of all methods, for each plugin. But you have the option to configure different version per plugin. This version will then be called for every method call for that plugin (per thunderJS instance).
+
+You can do this by passsing in a `versions` object with a key-value pair for each relevant plugin. You can also pass in a `default` value to overwrite the standard default value of 1.
+
+```js
+import ThunderJS from './thunderJS'
+
+const config = {
+  host: 'localhost:3030',
+  versions: {
+    default: 5, // use version 5 if plugin not specified
+    controller: 1,
+    device: 15,
+    messenger: 7,
+    // etc ..
+  }
+}
+const thunderJS = ThunderJS(config)
 ```
 
 ### Processing the result of an API call
@@ -102,7 +129,7 @@ On top of that the ThunderJS library implements 2 convenience methods to retriev
 thunderJS.device
   .freeRam()
   .then(ram => {
-    log('Free ram', ram)
+    console.log('Free ram', ram)
   })
   .catch(err => {
     console.error('Error', err)
