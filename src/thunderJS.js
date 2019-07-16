@@ -2,11 +2,13 @@ import API from './api'
 import plugins from './plugins'
 import listener from './listener'
 
+const defaultVersion = 1
+
 let api
 
 export default (options) => {
   api = API(options.host)
-  return wrapper({...thunder, ...plugins, ...{api}})
+  return wrapper({...thunder(options), ...plugins, ...{api}})
 }
 
 const resolve = (result, args) => {
@@ -34,42 +36,45 @@ const resolve = (result, args) => {
   }
 }
 
-const thunder = {
-  plugin: false,
-  call() {
-    // little trick to set the plugin name when calling from a plugin context (if not already set)
-    const args = [...arguments]
-    if(this.plugin) {
-      args[0] !== this.plugin ? args.unshift(this.plugin) : null
-    }
-    // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
-    else {
-      const plugin = args[0]
-      this.plugin = plugin
-    }
-    const method = args[1]
-    if(typeof this[this.plugin][method] == 'function') {
-      return this[this.plugin][method](args)
-    }
+const thunder = (options) => ({
+    options,
+    plugin: false,
+    call() {
+      // little trick to set the plugin name when calling from a plugin context (if not already set)
+      const args = [...arguments]
+      if(this.plugin) {
+        args[0] !== this.plugin ? args.unshift(this.plugin) : null
+      }
+      // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
+      else {
+        const plugin = args[0]
+        this.plugin = plugin
+      }
+      const method = args[1]
+      if(typeof this[this.plugin][method] == 'function') {
+        return this[this.plugin][method](args)
+      }
 
-    return this.api.request.apply(this, args)
+      // merge in the version
+      args.splice(1,0, getVersion(options.versions, this.plugin))
 
-  },
-  registerPlugin(name, plugin) {
-      this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
-  },
-  subscribe() {
-    // subscribe to notification
-    // to do
-  },
-  on() {
-    console.log('on???')
-    return listener()
-  },
-  once() {
-    return listener()
-  },
-}
+      return this.api.request.apply(this, args)
+
+    },
+    registerPlugin(name, plugin) {
+        this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
+    },
+    subscribe() {
+      // subscribe to notification
+      // to do
+    },
+    on() {
+      return listener()
+    },
+    once() {
+      return listener()
+    },
+})
 
 const wrapper = obj => {
   return new Proxy(obj, {
@@ -88,12 +93,12 @@ const wrapper = obj => {
           }
         }
         if(typeof prop === 'object') {
-          return wrapper(Object.assign(Object.create(thunder), prop, {plugin: propKey}))
+          return wrapper(Object.assign(Object.create(thunder(target.options)), prop, {plugin: propKey}))
         }
         return prop
       } else {
         if(target.plugin === false) {
-          return wrapper(Object.assign(Object.create(thunder), {}, {plugin: propKey}))
+          return wrapper(Object.assign(Object.create(thunder(target.options)), {}, {plugin: propKey}))
         }
         return function(...args) {
           args.unshift(propKey)
@@ -102,4 +107,8 @@ const wrapper = obj => {
       }
     },
   })
+}
+
+const getVersion = (versions, plugin) => {
+  return versions ? (versions[plugin] || versions.default || defaultVersion) : {}
 }
