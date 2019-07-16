@@ -20,8 +20,8 @@ websocket.on('connection', function(ws) {
       id: input.id,
     }
     // fake output, usually a success response, sometimes an error
-    Math.random() >= 0.3
-      ? (body.result = API(plugin, version, method))
+    Math.random() >= 0
+      ? (body.result = API(plugin, version, method, input.params, ws))
       : (body.error = 'Oops .. something went wrong')
 
     // simulate latency with a random timeout

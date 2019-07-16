@@ -1,4 +1,4 @@
-const device = method => {
+const controller = (method, params, ws) => {
   let result
 
   switch (method) {
@@ -71,9 +71,36 @@ const device = method => {
     case 'configuration':
       result = {}
       break
+    case 'register':
+      // start sending notifications
+      sendNotification([params.id, params.event].join('.'), ws)
+      result = 0
+      break
+
+    case 'unregister':
+      clearTimeout(notifications[[params.id, params.event].join('.')])
+      result = 0
+      break
   }
 
   return result
 }
 
-export default device
+const notifications = {}
+
+const sendNotification = (method, ws) => {
+  clearTimeout(notifications[method])
+  console.log('send notification', method)
+  const body = {
+    jsonrpc: '2.0',
+    method: method,
+    params: { value: Math.random() },
+  }
+  ws.send(JSON.stringify(body))
+  // recursive
+  notifications[method] = setTimeout(() => {
+    sendNotification(method, ws)
+  }, (Math.random() * 10 + 1) * 1000) // random timeout between 1 and 10 seconds
+}
+
+export default controller

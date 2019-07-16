@@ -3,7 +3,13 @@ import Chalk from 'chalk'
 
 import ThunderJS from '../src/thunderJS'
 
-const thunderJS = ThunderJS({ host: 'localhost:3030' })
+const thunderJS = ThunderJS({
+  host: 'localhost:3030',
+  versions: {
+    default: 2,
+    device: 3,
+  },
+})
 
 const examples = [
   // promise based examples
