@@ -35,21 +35,25 @@ test('thunderJS instance - Methods', assert => {
   assert.end()
 })
 
-test('thunderJS - device plugin', assert => {
+test('thunderJS - DeviceInfo plugin', assert => {
   let thunderJS = ThunderJS(options)
 
   let expected = 'object'
-  let actual = typeof thunderJS.device
+  let actual = typeof thunderJS.DeviceInfo
 
-  assert.equal(actual, expected, 'thunderJS should have a `device` key that returns an `object`')
+  assert.equal(
+    actual,
+    expected,
+    'thunderJS should have a `DeviceInfo` key that returns an `object`'
+  )
 
   expected = ['freeRam', 'version']
-  actual = Object.keys(thunderJS.device).filter(key => {
+  actual = Object.keys(thunderJS.DeviceInfo).filter(key => {
     // get the object keys that are a function
-    return typeof thunderJS.device[key] === 'function'
+    return typeof thunderJS.DeviceInfo[key] === 'function'
   })
 
-  assert.deepEqual(actual, expected, 'device plugin should have all the methods')
+  assert.deepEqual(actual, expected, 'DeviceInfo plugin should have all the methods')
   assert.end()
 })
 

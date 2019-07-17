@@ -1,5 +1,5 @@
-import device from './device'
+import DeviceInfo from './DeviceInfo'
 
 export default {
-  device,
+  DeviceInfo,
 }
