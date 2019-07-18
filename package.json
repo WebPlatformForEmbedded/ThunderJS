@@ -3,7 +3,7 @@
   "name": "thunderjs",
   "version": "0.0.1",
   "license": "apache",
-  "main": "src/thunder.js",
+  "main": "src/thunderJS.js",
   "scripts": {
     "test": "tape -r esm tests/**/*.spec.js | tap-diff",
     "start": "concurrently \"npm run server\" \"npm run examples\"",
