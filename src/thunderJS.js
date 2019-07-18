@@ -5,7 +5,7 @@ import listener from './listener'
 let api
 
 export default (options) => {
-  api = API(options.host, options.versions)
+  api = API(options)
   return wrapper({...thunder(options), ...plugins})
 }
 

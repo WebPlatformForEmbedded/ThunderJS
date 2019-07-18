@@ -1,7 +1,7 @@
 import WebSocket from 'isomorphic-ws'
 import listeners from './listenersStore'
 
-const endpoint = '/' // jsonrpc
+const endpoint = '/jsonrpc'
 const protocols = 'notification'
 const defaultVersion = 1
 
@@ -9,7 +9,7 @@ const getVersion = (versions, plugin) => {
   return versions ? versions[plugin] || versions.default || defaultVersion : defaultVersion
 }
 
-export default (host, versions) => {
+export default options => {
   let connection = null
   let socket = null
   const connect = () => {
@@ -19,7 +19,7 @@ export default (host, versions) => {
       } else {
         try {
           if (!socket) {
-            socket = new WebSocket('ws://' + host + endpoint, protocols)
+            socket = new WebSocket('ws://' + options.host + endpoint, protocols)
             socket.addEventListener('message', message => {
               requestQueueResoler(JSON.parse(message.data))
             })
@@ -50,7 +50,8 @@ export default (host, versions) => {
     if (data.id) {
       const request = requestsQueue[data.id]
       if (request) {
-        if (data.result) request.resolve(data.result)
+        // result can also be null, that's why we check for the existence of the key
+        if ('result' in data) request.resolve(data.result)
         else request.reject(data.error)
         delete requestsQueue[data.id]
       } else {
@@ -78,12 +79,19 @@ export default (host, versions) => {
     request(plugin, method, params) {
       return new Promise((resolve, reject) => {
         const requestId = getId()
-        const version = getVersion(versions, plugin)
+        const version = getVersion(options.versions, plugin)
         const body = {
           jsonrpc: '2.0',
           id: requestId,
           method: [plugin, version, method].join('.'),
-          params: params || {},
+          params: params,
+        }
+
+        if (options.debug) {
+          console.log(' ')
+          console.log('API REQUEST:')
+          console.log(JSON.stringify(body, null, 2))
+          console.log(' ')
         }
 
         requestsQueue[requestId] = {
