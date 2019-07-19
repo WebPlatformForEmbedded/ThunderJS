@@ -1,6 +1,9 @@
 {
-  "author": "Metrological, Wouter <wouter@metrological.com>",
-  "name": "thunderjs",
+  "author": "Michiel van der Geest <m.van.der.geest@metrological.com>",
+  "contributors": [
+    "Metrological, Wouter <wouter@metrological.com>"
+  ],
+  "name": "ThunderJS",
   "version": "0.0.1",
   "license": "apache",
   "main": "src/thunderJS.js",
