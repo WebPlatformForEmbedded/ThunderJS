@@ -1,162 +1,208 @@
 import test from 'tape'
-import ThunderJS from '../src/thunderJS'
 import sinon from 'sinon'
+
+import ThunderJS from '../src/thunderJS'
+import * as API from '../src/api/index'
 
 const options = { host: 'localhost' }
 
-const plugin = {
-  foo() {},
-  bar() {},
+const makeBodySpy = sinon.spy(API, 'makeBody')
+const apiRequestSpy = sinon.spy(API, 'execRequest')
+
+const connectStub = sinon.stub(API, 'connect').callsFake(() => {
+  return new Promise(resolve => {
+    resolve({
+      // stubbed send
+      send() {},
+    })
+  })
+})
+
+const resetStubsAndSpies = () => {
+  connectStub.resetHistory()
+  apiRequestSpy.resetHistory()
+  makeBodySpy.resetHistory()
 }
-const fooSpy = sinon.spy(plugin, 'foo')
-const barSpy = sinon.spy(plugin, 'bar')
 
 test('thunderJS - call - argument based', assert => {
+  resetStubsAndSpies()
+
   let thunderJS = ThunderJS(options)
 
-  fooSpy.resetHistory()
-  barSpy.resetHistory()
+  // make call using argument style
+  thunderJS.call('DeviceInfo', 'systeminfo')
 
-  thunderJS.registerPlugin('custom', plugin)
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'DeviceInfo.1.systeminfo',
+      })
+    ),
+    'Should make a jsonrpc body with id 1 and method DeviceInfo.1.systeminfo'
+  )
 
-  // make calls using argument style
-  thunderJS.call('custom', 'foo')
-  thunderJS.call('custom', 'bar')
-
-  assert.ok(fooSpy.calledOnce, 'Should call the foo method on the custom plugin')
-  assert.ok(barSpy.calledOnce, 'Should call the bar method on the custom plugin')
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1],
+    {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'DeviceInfo.1.systeminfo',
+      params: ['DeviceInfo', 'systeminfo'], // this is wrong!!
+    },
+    'Should make a request for DeviceInfo.1.systeminfo'
+  )
 
   assert.end()
 })
 
 test('thunderJS - call - object based', assert => {
+  resetStubsAndSpies()
+
   let thunderJS = ThunderJS(options)
 
-  fooSpy.resetHistory()
-  barSpy.resetHistory()
+  // make call using object style
+  thunderJS.DeviceInfo.systeminfo()
 
-  thunderJS.registerPlugin('custom', plugin)
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 2,
+        method: 'DeviceInfo.1.systeminfo',
+      })
+    ),
+    'Should make a request for DeviceInfo.1.systeminfo'
+  )
 
-  // make calls using object style
-  thunderJS.custom.foo()
-  thunderJS.custom.bar()
-
-  assert.ok(fooSpy.calledOnce, 'Should call the foo method on the custom plugin')
-  assert.ok(barSpy.calledOnce, 'Should call the bar method on the custom plugin')
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1],
+    {
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'DeviceInfo.1.systeminfo',
+    },
+    'Should make a request for DeviceInfo.1.systeminfo'
+  )
 
   assert.end()
 })
 
-test('thunderJS - response - promise', assert => {
+test('thunderJS - call - specifying method versions', assert => {
+  resetStubsAndSpies()
+
+  let config = {
+    ...options,
+    versions: {
+      default: 2,
+      DeviceInfo: 3,
+    },
+  }
+
+  let thunderJS = ThunderJS(config)
+
+  // default version from config
+  thunderJS.Controller.activate('DeviceInfo')
+  assert.ok(
+    makeBodySpy.firstCall.returned(sinon.match({ method: 'Controller.2.activate' })),
+    'Body of request should specify method with the version defined as default in config'
+  )
+
+  // specified plugin version in config
+  thunderJS.DeviceInfo.systeminfo()
+  assert.ok(
+    makeBodySpy.secondCall.returned(sinon.match({ method: 'DeviceInfo.3.systeminfo' })),
+    'Body of request should specify method the version of the plugin in config'
+  )
+
+  // version passed as argument
+  thunderJS.DeviceInfo.systeminfo({ version: 10 })
+  assert.ok(
+    makeBodySpy.thirdCall.returned(sinon.match({ method: 'DeviceInfo.10.systeminfo' })),
+    'Body of request should specify method with the version as passed in params'
+  )
+
+  assert.end()
+})
+
+test('thunderJS - call - argument based - with params', assert => {
+  resetStubsAndSpies()
+
+  console.log('options!!', options)
   let thunderJS = ThunderJS(options)
 
-  thunderJS.registerPlugin('custom', {
-    promise() {
-      return new Promise((resolve, reject) => {})
-    },
-    value() {
-      return 'hello!'
-    },
-    object() {
-      return { hi: 'there' }
-    },
-    err() {
-      return new Error('this is an error')
-    },
+  // make call using argument style
+  thunderJS.call('Controller', 'activate', {
+    callsign: 'DeviceInfo',
   })
 
-  // call promise method and see if it has a then function (as promises do)
-  let actual = thunderJS.custom.promise().then
-  assert.ok(actual, 'Calls on thunderJS should return a promise')
-
-  // call value method and see if it has a then function (as promises do)
-  actual = thunderJS.custom.value().then
   assert.ok(
-    actual,
-    'Calls on thunderJS should return a promise (even if the method only returns a value)'
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 6,
+        method: 'Controller.1.activate',
+        params: {
+          callsign: 'DeviceInfo',
+        },
+      })
+    ),
+    'Should make a jsonrpc body with id 6 and method Controller.1.activate'
   )
 
-  actual = thunderJS.custom.object().then
-  assert.ok(
-    actual,
-    'Calls on thunderJS should return a promise (even if the method returns an object literal)'
-  )
-
-  let result = thunderJS.custom.err()
-  actual = result.then
-  // handle the error properly
-  result.catch(err => {})
-
-  assert.ok(
-    actual,
-    'Calls on thunderJS should return a promise (even if the method returns an Error)'
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1],
+    {
+      jsonrpc: '2.0',
+      method: 'Controller.1.activate',
+      id: 6,
+      params: {
+        callsign: 'DeviceInfo',
+      },
+    },
+    'Should make a request for Controller.1.activate, with params'
   )
 
   assert.end()
 })
 
-const plugin2 = {
-  success() {
-    return new Promise((resolve, reject) => {
-      resolve('😎')
-    })
-  },
-  failure() {
-    return new Promise((resolve, reject) => {
-      reject('😭')
-    })
-  },
-}
+test('thunderJS - call - object style - with params', assert => {
+  resetStubsAndSpies()
 
-test('thunderJS - response - then / catch', assert => {
   let thunderJS = ThunderJS(options)
 
-  const successSpy = sinon.spy()
-  const failureSpy = sinon.spy()
+  // make call using object style
+  thunderJS.Controller.activate({
+    callsign: 'DeviceInfo',
+  })
 
-  thunderJS.registerPlugin('custom', plugin2)
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        method: 'Controller.1.activate',
+        id: 7,
+        params: {
+          callsign: 'DeviceInfo',
+        },
+      })
+    ),
+    'Should make a jsonrpc body with id 7 and method Controller.1.activate'
+  )
 
-  assert.plan(2)
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1],
+    {
+      jsonrpc: '2.0',
+      method: 'Controller.1.activate',
+      id: 7,
+      params: {
+        callsign: 'DeviceInfo',
+      },
+    },
+    'Should make a request for Controller.1.activate, with params'
+  )
 
-  thunderJS
-    .call('custom', 'success')
-    .then(successSpy)
-    .catch(failureSpy)
-    .finally(() => {
-      assert.ok(successSpy.calledOnceWith('😎'), 'Success method should be called once')
-    })
-
-  thunderJS
-    .call('custom', 'failure')
-    .then(successSpy)
-    .catch(failureSpy)
-    .finally(() => {
-      assert.ok(failureSpy.calledOnceWith('😭'), 'Failure method should be called once')
-    })
-})
-
-test('thunderJS - response - passing callback', assert => {
-  let thunderJS = ThunderJS(options)
-
-  const callback = () => {}
-
-  const callbackSpy = sinon.spy(callback)
-
-  thunderJS.registerPlugin('custom', plugin2)
-
-  thunderJS.call('custom', 'success', callbackSpy)
-  thunderJS.call('custom', 'failure', callbackSpy)
-
-  // next tick
-  setTimeout(() => {
-    assert.ok(
-      callbackSpy.calledWith(null, '😎'),
-      'Callback should be called once with null as first param and success as second'
-    )
-    assert.ok(
-      callbackSpy.calledWith('😭'),
-      'Callback should be called once with only the error as first param'
-    )
-    assert.end()
-  }, 0)
+  assert.end()
 })

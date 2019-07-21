@@ -1,4 +1,4 @@
-import listeners from './listenersStore'
+import { listeners } from './store'
 
 export default function(plugin, event, callback) {
   const thunder = this

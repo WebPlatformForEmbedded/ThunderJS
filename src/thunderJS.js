@@ -4,9 +4,9 @@ import listener from './listener'
 
 let api
 
-export default (options) => {
+export default options => {
   api = API(options)
-  return wrapper({...thunder(options), ...plugins})
+  return wrapper({ ...thunder(options), ...plugins })
 }
 
 const resolve = (result, args) => {
@@ -16,9 +16,7 @@ const resolve = (result, args) => {
     typeof result !== 'object' ||
     // an object that doesn't look like a promise
     (typeof result === 'object' && (!result.then || typeof result.then !== 'function'))
-
   ) {
-
     result = new Promise((resolve, reject) => {
       result instanceof Error === false ? resolve(result) : reject(result)
     })
@@ -33,30 +31,29 @@ const resolve = (result, args) => {
   }
 }
 
-const thunder = (options) => ({
-    options,
-    plugin: false,
-    call() {
-      // little trick to set the plugin name when calling from a plugin context (if not already set)
-      const args = [...arguments]
-      if(this.plugin) {
-        args[0] !== this.plugin ? args.unshift(this.plugin) : null
-      }
-      // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
-      else {
-        const plugin = args[0]
-        this.plugin = plugin
-      }
-      const method = args[1]
-      if(typeof this[this.plugin][method] == 'function') {
-        return this[this.plugin][method](args)
-      }
+const thunder = options => ({
+  options,
+  plugin: false,
+  call() {
+    // little trick to set the plugin name when calling from a plugin context (if not already set)
+    const args = [...arguments]
+    if (this.plugin) {
+      args[0] !== this.plugin ? args.unshift(this.plugin) : null
+    }
+    // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
+    else {
+      const plugin = args[0]
+      this.plugin = plugin
+    }
+    const method = args[1]
+    if (typeof this[this.plugin][method] == 'function') {
+      return this[this.plugin][method](args)
+    }
 
-      return this.api.request.apply(this, args)
-
+    return this.api.request.apply(this, args)
   },
   registerPlugin(name, plugin) {
-      this[name] = wrapper(Object.assign(Object.create(thunder), plugin, {plugin: name}))
+    this[name] = wrapper(Object.assign(Object.create(thunder), plugin, { plugin: name }))
   },
   subscribe() {
     // subscribe to notification
@@ -65,7 +62,7 @@ const thunder = (options) => ({
   on() {
     // first make sure the plugin is the first argument (independent from being called as argument style or object style)
     const args = [...arguments]
-    if(this.plugin) {
+    if (this.plugin) {
       args[0] !== this.plugin ? args.unshift(this.plugin) : null
     }
 
@@ -82,14 +79,14 @@ const wrapper = obj => {
       const prop = target[propKey]
 
       // return the initialized api object, when key is api
-      if(propKey === 'api') {
+      if (propKey === 'api') {
         return api
       }
 
       if (typeof prop !== 'undefined') {
-        if(typeof prop === 'function') {
+        if (typeof prop === 'function') {
           // on, once and subscribe don't need to be wrapped in a resolve
-          if(['on', 'once', 'subscribe'].indexOf(propKey) > -1) {
+          if (['on', 'once', 'subscribe'].indexOf(propKey) > -1) {
             return function(...args) {
               return prop.apply(this, args)
             }
@@ -98,13 +95,17 @@ const wrapper = obj => {
             return resolve(prop.apply(this, args), args)
           }
         }
-        if(typeof prop === 'object') {
-          return wrapper(Object.assign(Object.create(thunder(target.options)), prop, {plugin: propKey}))
+        if (typeof prop === 'object') {
+          return wrapper(
+            Object.assign(Object.create(thunder(target.options)), prop, { plugin: propKey })
+          )
         }
         return prop
       } else {
-        if(target.plugin === false) {
-          return wrapper(Object.assign(Object.create(thunder(target.options)), {}, {plugin: propKey}))
+        if (target.plugin === false) {
+          return wrapper(
+            Object.assign(Object.create(thunder(target.options)), {}, { plugin: propKey })
+          )
         }
         return function(...args) {
           args.unshift(propKey)
