@@ -1,4 +1,4 @@
-import { connect } from './index'
+import connect from './connect'
 
 export default (options, body) => {
   connect(options)
