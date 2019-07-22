@@ -1,5 +1,5 @@
 import API from './api'
-import plugins from './plugins'
+import plugins from './plugins/index'
 import listener from './listener'
 
 let api
