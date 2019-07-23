@@ -1,13 +1,12 @@
 import Contra from 'contra'
 import Chalk from 'chalk'
+import Inquirer from 'inquirer'
+import fs from 'fs'
 
 import ThunderJS from '../../module/thunderJS'
 
 const delay = 2000
-const thunderJS = ThunderJS({
-  host: '192.168.15.22',
-  debug: true,
-})
+let thunderJS
 
 const examples = [
   // promise based examples
@@ -175,8 +174,24 @@ const examples = [
   },
 ]
 
-Contra.series(examples, () => {
-  log('All examples done')
+const filename = './.host'
+const host = fs.existsSync(filename) ? fs.readFileSync(filename, 'utf8') : null
+
+Inquirer.prompt([
+  {
+    name: 'host',
+    message: 'Please inform the IP of your STB',
+    default: host,
+  },
+]).then(answers => {
+  fs.writeFileSync(filename, answers.host, 'utf8')
+  thunderJS = ThunderJS({
+    host: answers.host,
+    debug: true,
+  })
+  Contra.series(examples, () => {
+    log('All examples done')
+  })
 })
 
 const log = (...args) => {

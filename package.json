@@ -13,7 +13,8 @@
     "lint": "eslint '**/*.{js}'",
     "lint:fix": "eslint '**/*.{js}' --fix",
     "build": "rollup -c",
-    "example:browser": "cd examples && npm install && npm run start:browser"
+    "example:browser": "cd examples && npm install && npm run start:browser",
+    "example:node": "cd examples && npm install && npm run start:node"
   },
   "lint-staged": {
     "*.{js}": [
