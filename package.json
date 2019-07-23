@@ -12,7 +12,8 @@
     "test": "tape -r esm tests/**/*.spec.js | tap-diff",
     "lint": "eslint '**/*.{js}'",
     "lint:fix": "eslint '**/*.{js}' --fix",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "example:browser": "cd examples && npm install && npm run start:browser"
   },
   "lint-staged": {
     "*.{js}": [
@@ -36,8 +37,6 @@
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "babel-eslint": "^10.0.1",
-    "chalk": "^2.4.2",
-    "contra": "^1.9.4",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.0",

@@ -129,7 +129,6 @@ test('thunderJS - call - specifying method versions', assert => {
 test('thunderJS - call - argument based - with params', assert => {
   resetStubsAndSpies()
 
-  console.log('options!!', options)
   let thunderJS = ThunderJS(options)
 
   // make call using argument style

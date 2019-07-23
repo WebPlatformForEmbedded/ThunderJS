@@ -1,0 +1,12 @@
+{
+  "author": "Michiel van der Geest <m.van.der.geest@metrological.com>",
+  "name": "ThunderJS-examples",
+  "version": "0.0.1",
+  "license": "apache",
+  "dependencies": {
+    "http-server": "^0.11.1"
+  },
+  "scripts": {
+    "start:browser": "http-server ./browser -o"
+  }
+}
