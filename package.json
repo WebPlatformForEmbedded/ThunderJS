@@ -10,9 +10,6 @@
   "main": "module/thunderJS.js",
   "scripts": {
     "test": "tape -r esm tests/**/*.spec.js | tap-diff",
-    "start": "concurrently \"npm run server\" \"npm run examples\"",
-    "server": "node -r esm server/index.js",
-    "examples": "node -r esm examples/index.js",
     "lint": "eslint '**/*.{js}'",
     "lint:fix": "eslint '**/*.{js}' --fix",
     "build": "rollup -c"
@@ -40,7 +37,6 @@
     "@babel/preset-env": "^7.5.5",
     "babel-eslint": "^10.0.1",
     "chalk": "^2.4.2",
-    "concurrently": "^4.1.1",
     "contra": "^1.9.4",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
