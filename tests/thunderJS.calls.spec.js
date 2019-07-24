@@ -3,13 +3,14 @@ import sinon from 'sinon'
 
 import ThunderJS from '../src/thunderJS'
 import * as API from '../src/api/index'
+import * as connect from '../src/api/connect'
 
 const options = { host: 'localhost' }
 
 const makeBodySpy = sinon.spy(API, 'makeBody')
 const apiRequestSpy = sinon.spy(API, 'execRequest')
 
-const connectStub = sinon.stub(API, 'connect').callsFake(() => {
+const connectStub = sinon.stub(connect, 'default').callsFake(() => {
   return new Promise(resolve => {
     resolve({
       // stubbed send
