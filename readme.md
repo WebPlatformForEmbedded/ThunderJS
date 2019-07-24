@@ -1,41 +1,73 @@
 # ThunderJS
 
-A flexible and extensible JS library to interact with WPE Thunder.
+A flexible and extensible JS library to interact with [WPEframework (Thunder)](https://github.com/WebPlatformForEmbedded/Thunder/)
 
-**Work in Progress!**
+## About ThunderJS
+
+ThunderJS is an _isomorphic_ or _universal_ library, which means it can be used in a browser environment as well as a NodeJS environment.
+
+ThunderJS makes is easy to make API calls to Thunder (WPEframework) over a Websocket connection. ThunderJS can also be used to listen to (and act upon) notifications broadcasted by Thunder.
 
 ## Getting started
 
-1. Clone this repository (`prototype` branch)
-2. Run `npm install` to install the project's dependencies
-3. Run `npm start`, this will
-   1. Fire up a rudimentary mock server to replicate WPE Thunder jsonrpc responses (run separately with `npm run server`)
-   2. Run the set of examples of how to interact with WPE Thunder through the ThunderJS library (run separately with `npm run examples`)
+ThunderJS can be installed into your project via _NPM_ or _Yarn_, installing directly from GitHub:
 
-## Basics
+```Shell
+npm install github:WebPlatformForEmbedded/ThunderJS
+// or
+yarn add github:WebPlatformForEmbedded/ThunderJS
+```
 
-The goal of ThunderJS is to
-1) make API calls to the WPE Thunder back-end and
-2) listen to (and act upon) notifications broadcasted by the back-end (wip).
+Next you can `import` or `require` the ThunderJS dependency into your own script and start implementing it from there.
+
+```js
+import ThunderJS from 'ThunderJS',
+// or
+const ThunderJS = require('ThunderJS)
+```
+
+## Examples
+
+This repository contains examples of how to use and implement this library in a browser environment and in a NodeJS environment.
+
+In order to run the examples you should first:
+
+1. Clone this repository
+2. And run `npm install` to install the project's dependencies
+
+### Browser
+
+Run `npm run example:browser` to 1) install the example's dependencies and 2) fire up a local webserver that serves a browser based implementation of ThunderJS
+
+### NodeJS
+
+Run `npm run example:node` to 1) install the example's dependencies and 2) start a NodeJS / CLI implementatio of ThunderJS
+
+
+## Using the library
+
+Note: all examples use _ES6 syntax_. In order to use this syntax, depending on your target environment, you might need to use a [Babel](https://babeljs.io/docs/en/learn) and some kind of module bundler.
 
 ### Initializing the library
 
 ```js
-import ThunderJS from './thunderJS' // or const ThunderJS = require('./thunderJS')
+import ThunderJS from './thunderJS'
 
 const config = {
-  host: 'localhost:3030',
+  host: '192.168.1.100', // IP address of the box that runs Thunder (WPEframework)
 }
 const thunderJS = ThunderJS(config)
 ```
+
+It is possible to have multiple instances of ThunderJS, with different configuration.
 
 ### Making API calls
 
 In essence all API calls are made up of the following components:
 
-- plugin (i.e. `controller` or `device`)
+- plugin (i.e. `Controller` or `DeviceInfo`)
 - method (i.e `activate` or `systeminfo`)
-- params (`{foo: 'bar'}`, optional)
+- params (i.e. `{callsing: 'Bluetooth'}`, optional)
 
 The library supports 2 ways of making API calls, depending on your coding style preferences.
 
@@ -63,17 +95,17 @@ thunderJS.device.systeminfo(params)
 
 **Versions**
 
-The API supports different versions of the same methods, with a slightly different implementation depending on the specific STB.
+The Thunder API supports different versions of the same methods, with a slightly different implementation depending on the specific box.
 
-By default ThunderJS calls *version 1* of all methods, for each plugin. But you have the option to configure different version per plugin. This version will then be called for every method call for that plugin (per thunderJS instance).
+By default ThunderJS calls *version 1* of all methods, for each plugin. But during the initialization of ThunderJS, you have the option to configure which version(s) to use (per plugin). The configured version will be called for every method call for that plugin (per thunderJS instance).
 
-You can do this by passsing in a `versions` object with a key-value pair for each relevant plugin. You can also pass in a `default` value to overwrite the standard default value of 1.
+Configuring versions is done by passsing in a `versions` object with a key-value pair for each relevant plugin to the `ThunderJS` factory. It is also possible pass in a `default` value to overwrite the standard default value of 1.
 
 ```js
 import ThunderJS from './thunderJS'
 
 const config = {
-  host: 'localhost:3030',
+  host: '192.168.1.100',
   versions: {
     default: 5, // use version 5 if plugin not specified
     controller: 1,
@@ -85,18 +117,43 @@ const config = {
 const thunderJS = ThunderJS(config)
 ```
 
+In some cases you might need to call a different version for a specific *method*. In this case you can pass `version` as a `param`.
+
+```js
+import ThunderJS from './thunderJS'
+
+const config = {
+  host: '192.168.1.100',
+  versions: {
+    default: 5, // use version 5 if plugin not specified
+    controller: 1,
+    device: 15,
+    messenger: 7,
+    // etc ..
+  }
+}
+const thunderJS = ThunderJS(config)
+
+// use version 15 as specified in the config
+thunderJS.device.systeminfo()
+// override config and use version 14
+thunderJS.device.systeminfo({
+  version: 14
+})
+```
+
 ### Processing the result of an API call
 
-When an API call is made it can return a `result` in case of success or an `error`.
+When an API call to Thunder is made it can return a `result` in case of success or an `error`, when somethign goes wrong.
 
-The library supports 2 ways of processing the results of API calls, depending on your coding style preferences.
+The ThunderJS library supports 2 ways of processing the results of API calls, depending on your coding style preferences.
 
 **Option 1 - Promise based**
 
 ```js
 thunderJS.device.systeminfo()
   .then(result => {
-    console.log('Success!', result)
+    console.log('Success', result)
   }).catch(err => {
     console.error('Error', err)
   })
@@ -121,9 +178,9 @@ thunderJS.device.systeminfo((err, result) => {
 
 Besides calling the available WPE Thunder API methods and returning the result, ThunderJS can also implement extra helper methods.
 
-For example, the WPE Thunder API for the `device` plugin consists of only 3 methods (`systeminfo`, `addresses` and `socketinfo`).
+For example, the WPE Thunder API for the `DeviceInfo` plugin currently consists of only 3 methods (`systeminfo`, `addresses` and `socketinfo`).
 
-On top of that the ThunderJS library implements 2 convenience methods to retrieve the `version` and `freeRam` directly (which ultimately are retrieved from the API by calling the `systeminfo` method).
+On top of that the ThunderJS library implements 2 _convenience methods_ to retrieve the `version` and `freeRam` directly (which ultimately are retrieved from the API by calling the `systeminfo` method).
 
 ```js
 thunderJS.device
@@ -138,13 +195,17 @@ thunderJS.device
 
 ### Custom plugins
 
-You can easily implement custom plugins. A plugin consists of a plain JS object literal, that should be registered under the plugin's namespace.
+While it's not necesarry to create a specific plugin for every Thunder plugin (or Nano service) to be able to make API to that plugin, with ThunderJS you can easily implement custom plugins.
+
+You would create a custom plugin only, when you want to enhance the API of the Thunder plugin / Nano service with extra conviniece methods.
+
+A plugin consists of a plain JS object literal, that should be registered under the plugin's namespace.
 
 ```js
 // register the plugin
 thunderJS.registerPlugin('custom', {
-  method1() {
-    return this.call('foo', {foo:bar})
+  method1(bar) {
+    return this.call('foo', { foo: bar })
   },
   method2() {
     return this.call('bar').then(result => {
@@ -154,63 +215,72 @@ thunderJS.registerPlugin('custom', {
 })
 
 // call a method on the plugin
-thunderJS.custom.method1()
+thunderJS.custom.method1('bar')
   .then(console.log)
   .catch(console.error)
 ```
 
 ### Notifications
 
-**Proposal - work in progress**
+> While partially functional, notifications are work in progress.
 
-The simplest way to listen to and act upon a notification:
+Thunder (WPEframework) broadcasts notifications when events ocur in the system. However it will only broadcast those events that the client has subscribed to.
+
+ThunderJS makes it easy to subscribe to specific events, and execute a _callback-function_ upon every notification of each event.
+
+Simply define a listener, passing in the `plugin` as a first argument and the `event` as a second. As a third argument you can pass in the callback function (that receives the `notification` as an argument) every time a notification is received.
 
 ```js
-const listener = thunderJS.on('controller', 'statechange', (event) => {
-  console.log('Execute this callback on every notification', event)
+const listener = thunderJS.on('Controller', 'statechange', (notification) => {
+  console.log('Execute this callback on every notification', notification)
 })
 
 // dispose when done listening
 listener.dispose()
 ```
 
-Or if you want to listen only once
+In case you want to listen only once, you can use `once` instead of `on`
+
+> The `once` method is work in progress!
+
 ```js
-const listener = thunderJS.once('controller', 'statechange', (event) => {
-  console.log('Execute this callback once', event)
+const listener = thunderJS.once('Controller', 'statechange', (notification) => {
+  console.log('Execute this callback once', notification)
 })
 
-// a once-listener can be disposed (before it's called, of course)
+// a once-listener can also be disposed (but you should do so before it's called, of course)
 listener.dispose()
 ```
 
 As with API calls, you can also use *object based* style to achieve the same result.
 
 ```js
-const listener = thunderJS.controller.on('statechange', (event) => {
-  console.log('Execute this callback on every notification', event)
+const listener = thunderJS.controller.on('statechange', (notification) => {
+  console.log('Execute this callback on every notification', notification)
 })
 ```
 
 ```js
-const listener = thunderJS.controller.once('statechange', (event) => {
-  console.log('Execute this callback once', event)
+const listener = thunderJS.controller.once('statechange', (notification) => {
+  console.log('Execute this callback once', notification)
 })
 ```
 
-You can attach multiple callbacks (listeners) to the same notification. They will be executed in sequence.
+You can attach multiple listeners to the same notification. The callbacks will then be executed in sequence.
 
 ```js
-const listener1 = thunderJS.controller.on('statechange', (event) => {
-  console.log('First callback!', event)
+const listener1 = thunderJS.controller.on('statechange', (notification) => {
+  console.log('First callback!', notification)
 })
 
-const listener2 = thunderJS.controller.on('statechange', (event) => {
-  console.log('Second callback!', event)
+const listener2 = thunderJS.controller.on('statechange', (notification) => {
+  console.log('Second callback!', notification)
 })
 ```
 
-If you want / need more control - for example because you need multiple listeners and want to keep track of them - you could also create a _subscription_.
+**Proposal / Work in progress!**
+
+If you want or need more control over listeners - for example because you need multiple listeners and want to keep track of them individually - you could also create a _subscription_ oject.
 
 ```js
 const subscription = thunderJS.subscribe('controller') // or thunderJS.controller.subscribe()
@@ -244,6 +314,6 @@ subscription.dispose()
 
 ## Running tests
 
-This library has a handful of unit / integration tests, located in the `tests` folder.
+This library has unit / integration tests, located in the `tests` folder.
 
 To run all the tests execute: `npm test`
