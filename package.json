@@ -4,7 +4,7 @@
     "Metrological, Wouter <wouter@metrological.com>"
   ],
   "name": "ThunderJS",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "license": "apache",
   "browser": "dist/thunderJS.js",
   "main": "module/thunderJS.js",
