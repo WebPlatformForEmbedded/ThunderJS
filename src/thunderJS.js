@@ -38,16 +38,16 @@ const thunder = options => ({
     // little trick to set the plugin name when calling from a plugin context (if not already set)
     const args = [...arguments]
     if (this.plugin) {
-      args[0] !== this.plugin ? args.unshift(this.plugin) : null
+      if (args[0] !== this.plugin) {
+        args.unshift(this.plugin)
+      }
     }
-    // when call is called from the root, with a plugin i.e thunderJS.call('device', 'version')
-    else {
-      const plugin = args[0]
-      this.plugin = plugin
-    }
+
+    const plugin = args[0]
     const method = args[1]
-    if (typeof this[this.plugin][method] == 'function') {
-      return this[this.plugin][method](args)
+
+    if (typeof this[plugin][method] == 'function') {
+      return this[plugin][method](args[2])
     }
 
     return this.api.request.apply(this, args)
@@ -63,7 +63,9 @@ const thunder = options => ({
     // first make sure the plugin is the first argument (independent from being called as argument style or object style)
     const args = [...arguments]
     if (this.plugin) {
-      args[0] !== this.plugin ? args.unshift(this.plugin) : null
+      if (args[0] !== this.plugin) {
+        args.unshift(this.plugin)
+      }
     }
 
     return listener.apply(this, args)

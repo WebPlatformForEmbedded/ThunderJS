@@ -50,7 +50,6 @@ test('thunderJS - call - argument based', assert => {
       jsonrpc: '2.0',
       id: 1,
       method: 'DeviceInfo.1.systeminfo',
-      params: ['DeviceInfo', 'systeminfo'], // this is wrong!!
     },
     'Should make a request for DeviceInfo.1.systeminfo'
   )
@@ -202,6 +201,95 @@ test('thunderJS - call - object style - with params', assert => {
       },
     },
     'Should make a request for Controller.1.activate, with params'
+  )
+
+  assert.end()
+})
+
+test('thunderJS - call - argument based - different plugins in sequence', assert => {
+  resetStubsAndSpies()
+
+  let thunderJS = ThunderJS(options)
+
+  // call Controller plugin
+  thunderJS.call('Controller', 'processinfo')
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 8,
+        method: 'Controller.1.processinfo',
+      })
+    ),
+    'Should make a jsonrpc body with id 8 and method Controller.1.processinfo'
+  )
+
+  // call DeviceInfo plugin
+  thunderJS.call('DeviceInfo', 'systeminfo')
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 9,
+        method: 'DeviceInfo.1.systeminfo',
+      })
+    ),
+    'Should make a jsonrpc body with id 9 and method DeviceInfo.1.systeminfo'
+  )
+
+  // call Controller plugin with arguments
+  thunderJS.call('Controller', 'activate', { callsign: 'DeviceInfo' })
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'Controller.1.activate',
+        params: {
+          callsign: 'DeviceInfo',
+        },
+      })
+    ),
+    'Should make a jsonrpc body with id 9 and method Controller.1.activate and params'
+  )
+
+  assert.end()
+})
+
+test('thunderJS - call - argument based mixed with aobject based', assert => {
+  resetStubsAndSpies()
+
+  let thunderJS = ThunderJS(options)
+
+  // call Controller plugin argument based
+  thunderJS.call('Controller', 'processinfo')
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 11,
+        method: 'Controller.1.processinfo',
+      })
+    ),
+    'Should make a jsonrpc body with id 11 and method Controller.1.processinfo'
+  )
+
+  // call DeviceInfo plugin object based
+  thunderJS.DeviceInfo.systeminfo()
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 12,
+        method: 'DeviceInfo.1.systeminfo',
+      })
+    ),
+    'Should make a jsonrpc body with id 12 and method DeviceInfo.1.systeminfo'
   )
 
   assert.end()
