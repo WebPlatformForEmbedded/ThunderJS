@@ -1,10 +1,10 @@
 # ThunderJS
 
-A flexible and extensible JS library to interact with [WPEframework (Thunder)](https://github.com/WebPlatformForEmbedded/Thunder/)
+A flexible and extensible JS library to interact with [Thunder (WPEframework)](https://github.com/WebPlatformForEmbedded/Thunder/)
 
 ## About ThunderJS
 
-ThunderJS is an _isomorphic_ or _universal_ library, which means it can be used in a browser environment as well as a NodeJS environment.
+ThunderJS is an _isomorphic_ library, which means it can be used in a browser environment as well as a NodeJS environment.
 
 ThunderJS makes is easy to make API calls to Thunder (WPEframework) over a Websocket connection. ThunderJS can also be used to listen to (and act upon) notifications broadcasted by Thunder.
 
@@ -74,7 +74,7 @@ The library supports 2 ways of making API calls, depending on your coding style 
 **Option 1 - Argument based**
 
 ```js
-const plugin = 'device'
+const plugin = 'DeviceInfo'
 const method = 'systeminfo'
 const params = {
   foo: 'bar'
@@ -90,12 +90,12 @@ const params = {
   foo: 'bar'
 }
 
-thunderJS.device.systeminfo(params)
+thunderJS.DeviceInfo.systeminfo(params)
 ```
 
 **Versions**
 
-The Thunder API supports different versions of the same methods, with a slightly different implementation depending on the specific box.
+The Thunder API supports different versions of the same methods, with a slightly different implementation depending on the specific box or needs of the project.
 
 By default ThunderJS calls *version 1* of all methods, for each plugin. But during the initialization of ThunderJS, you have the option to configure which version(s) to use (per plugin). The configured version will be called for every method call for that plugin (per thunderJS instance).
 
@@ -135,23 +135,23 @@ const config = {
 const thunderJS = ThunderJS(config)
 
 // use version 15 as specified in the config
-thunderJS.device.systeminfo()
+thunderJS.DeviceInfo.systeminfo()
 // override config and use version 14
-thunderJS.device.systeminfo({
+thunderJS.DeviceInfo.systeminfo({
   version: 14
 })
 ```
 
 ### Processing the result of an API call
 
-When an API call to Thunder is made it can return a `result` in case of success or an `error`, when somethign goes wrong.
+When an API call to Thunder is made it can return a `result` in case of success or an `error`, when something goes wrong.
 
 The ThunderJS library supports 2 ways of processing the results of API calls, depending on your coding style preferences.
 
 **Option 1 - Promise based**
 
 ```js
-thunderJS.device.systeminfo()
+thunderJS.DeviceInfo.systeminfo()
   .then(result => {
     console.log('Success', result)
   }).catch(err => {
@@ -162,7 +162,7 @@ thunderJS.device.systeminfo()
 **Option 2 - Callback based**
 
 ```js
-thunderJS.device.systeminfo((err, result) => {
+thunderJS.DeviceInfo.systeminfo((err, result) => {
   if(err) {
     console.error('Error', err)
   }
@@ -183,7 +183,7 @@ For example, the WPE Thunder API for the `DeviceInfo` plugin currently consists 
 On top of that the ThunderJS library implements 2 _convenience methods_ to retrieve the `version` and `freeRam` directly (which ultimately are retrieved from the API by calling the `systeminfo` method).
 
 ```js
-thunderJS.device
+thunderJS.DeviceInfo
   .freeRam()
   .then(ram => {
     console.log('Free ram', ram)
