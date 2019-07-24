@@ -278,7 +278,7 @@ const listener2 = thunderJS.controller.on('statechange', (notification) => {
 })
 ```
 
-**Proposal / Work in progress!**
+> **Proposal / Work in progress!**
 
 If you want or need more control over listeners - for example because you need multiple listeners and want to keep track of them individually - you could also create a _subscription_ oject.
 
