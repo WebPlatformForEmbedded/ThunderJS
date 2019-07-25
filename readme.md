@@ -108,9 +108,9 @@ const config = {
   host: '192.168.1.100',
   versions: {
     default: 5, // use version 5 if plugin not specified
-    controller: 1,
-    device: 15,
-    messenger: 7,
+    Controller: 1,
+    DeviceInfo: 15,
+    Messenger: 7,
     // etc ..
   }
 }
@@ -126,9 +126,9 @@ const config = {
   host: '192.168.1.100',
   versions: {
     default: 5, // use version 5 if plugin not specified
-    controller: 1,
-    device: 15,
-    messenger: 7,
+    Controller: 1,
+    DeviceInfo: 15,
+    Messenger: 7,
     // etc ..
   }
 }
@@ -255,13 +255,13 @@ listener.dispose()
 As with API calls, you can also use *object based* style to achieve the same result.
 
 ```js
-const listener = thunderJS.controller.on('statechange', (notification) => {
+const listener = thunderJS.Controller.on('statechange', (notification) => {
   console.log('Execute this callback on every notification', notification)
 })
 ```
 
 ```js
-const listener = thunderJS.controller.once('statechange', (notification) => {
+const listener = thunderJS.Controller.once('statechange', (notification) => {
   console.log('Execute this callback once', notification)
 })
 ```
@@ -269,11 +269,11 @@ const listener = thunderJS.controller.once('statechange', (notification) => {
 You can attach multiple listeners to the same notification. The callbacks will then be executed in sequence.
 
 ```js
-const listener1 = thunderJS.controller.on('statechange', (notification) => {
+const listener1 = thunderJS.Controller.on('statechange', (notification) => {
   console.log('First callback!', notification)
 })
 
-const listener2 = thunderJS.controller.on('statechange', (notification) => {
+const listener2 = thunderJS.Controller.on('statechange', (notification) => {
   console.log('Second callback!', notification)
 })
 ```
@@ -283,7 +283,7 @@ const listener2 = thunderJS.controller.on('statechange', (notification) => {
 If you want or need more control over listeners - for example because you need multiple listeners and want to keep track of them individually - you could also create a _subscription_ oject.
 
 ```js
-const subscription = thunderJS.subscribe('controller') // or thunderJS.controller.subscribe()
+const subscription = thunderJS.subscribe('Controller') // or thunderJS.Controller.subscribe()
 
 const listener = subscription.on('statechange', (event) => {
   console.log('Execute this callback on every notification', event)
