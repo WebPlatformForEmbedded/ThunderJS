@@ -67,7 +67,7 @@ In essence all API calls are made up of the following components:
 
 - plugin (i.e. `Controller` or `DeviceInfo`)
 - method (i.e `activate` or `systeminfo`)
-- params (i.e. `{callsing: 'Bluetooth'}`, optional)
+- params (i.e. `{callsign: 'Bluetooth'}`, optional)
 
 The library supports 2 ways of making API calls, depending on your coding style preferences.
 
