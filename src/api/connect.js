@@ -2,8 +2,8 @@ import WebSocket from 'isomorphic-ws'
 
 import requestQueueResolver from './requestQueueResolver'
 import notificationListener from './notificationListener'
+import makeWebsocketAddress from './makeWebsocketAddress'
 
-const endpoint = '/jsonrpc'
 const protocols = 'notification'
 
 let connection = null
@@ -16,7 +16,7 @@ export default options => {
     } else {
       try {
         if (!socket) {
-          socket = new WebSocket('ws://' + options.host + endpoint, protocols)
+          socket = new WebSocket(makeWebsocketAddress(options), protocols)
           socket.addEventListener('message', message => {
             requestQueueResolver(JSON.parse(message.data))
           })
