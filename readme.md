@@ -76,7 +76,7 @@ It is possible to have multiple instances of ThunderJS, with different configura
 
 In essence all API calls are made up of the following components:
 
-- plugin (i.e. `Controller` or `DeviceInfo`)
+- plugin (i.e. `Controller` or `DeviceInfo` **important**: plugin names are _case sensitive_)
 - method (i.e `activate` or `systeminfo`)
 - params (i.e. `{callsign: 'Bluetooth'}`, optional)
 
