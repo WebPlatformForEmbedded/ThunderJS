@@ -9,7 +9,6 @@ let wsStub
 
 test('Setup - thunderJS - api', assert => {
   wsStub = sinon.stub(ws, 'default').callsFake(address => {
-    console.log('hello', address)
     return {
       addEventListener() {},
     }
@@ -54,8 +53,6 @@ test('thunderJS - api - custom websocket connection', assert => {
 
   // make a call, to initiate a (stubbed) websocket connection
   thunderJS.DeviceInfo.systeminfo()
-
-  console.log(wsStub.thisValues)
 
   assert.ok(
     wsStub.calledWith('wss://192.168.1.100:2020/api'),
