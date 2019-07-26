@@ -54,9 +54,20 @@ Note: all examples use _ES6 syntax_. In order to use this syntax, depending on y
 import ThunderJS from './thunderJS'
 
 const config = {
-  host: '192.168.1.100', // IP address of the box that runs Thunder (WPEframework)
+  host: '192.168.1.100', // IP address of the box that runs Thunder (WPEframework) - required
 }
 const thunderJS = ThunderJS(config)
+```
+
+If your box is running Thunder under a different *port* than the default port **80**, you can specify this in your configuration object (together with some extra properties of the websocket address).
+
+```js
+const config = {
+  host: '192.168.1.100', // defaults to localhost,
+  port: 2020, // defaults to 80
+  endpoint: '/api', // defaults to '/jsonrpc'
+  protocol: 'wss://', // defaults to 'ws://'
+}
 ```
 
 It is possible to have multiple instances of ThunderJS, with different configuration.
