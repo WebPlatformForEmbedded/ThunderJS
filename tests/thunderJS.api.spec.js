@@ -5,10 +5,17 @@ import ThunderJS from '../src/thunderJS'
 import * as API from '../src/api/index'
 import * as ws from 'isomorphic-ws'
 
-const wsStub = sinon.stub(ws, 'default').callsFake(() => {
-  return {
-    addEventListener() {},
-  }
+let wsStub
+
+test('Setup - thunderJS - api', assert => {
+  wsStub = sinon.stub(ws, 'default').callsFake(address => {
+    console.log('hello', address)
+    return {
+      addEventListener() {},
+    }
+  })
+
+  assert.end()
 })
 
 test('makeWebsocketAddress - unit test', assert => {
@@ -48,9 +55,11 @@ test('thunderJS - api - custom websocket connection', assert => {
   // make a call, to initiate a (stubbed) websocket connection
   thunderJS.DeviceInfo.systeminfo()
 
+  console.log(wsStub.thisValues)
+
   assert.ok(
     wsStub.calledWith('wss://192.168.1.100:2020/api'),
-    'Websocket with default address should be initiated'
+    'Websocket with default custom address should be initiated'
   )
 
   assert.end()

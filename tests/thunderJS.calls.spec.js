@@ -7,23 +7,38 @@ import * as connect from '../src/api/connect'
 
 const options = { host: 'localhost' }
 
-const makeBodySpy = sinon.spy(API, 'makeBody')
-const apiRequestSpy = sinon.spy(API, 'execRequest')
-
-const connectStub = sinon.stub(connect, 'default').callsFake(() => {
-  return new Promise(resolve => {
-    resolve({
-      // stubbed send
-      send() {},
-    })
-  })
-})
+let makeBodySpy
+let apiRequestSpy
+let connectStub
+let makeIdStub
 
 const resetStubsAndSpies = () => {
+  makeIdStub.resetHistory()
   connectStub.resetHistory()
   apiRequestSpy.resetHistory()
   makeBodySpy.resetHistory()
 }
+
+test('Setup - thunderJS - calls', assert => {
+  makeBodySpy = sinon.spy(API, 'makeBody')
+  apiRequestSpy = sinon.spy(API, 'execRequest')
+
+  connectStub = sinon.stub(connect, 'default').callsFake(() => {
+    return new Promise(resolve => {
+      resolve({
+        // stubbed send
+        send() {},
+      })
+    })
+  })
+
+  makeIdStub = sinon.stub(API, 'makeId').callsFake(() => {
+    // always return id of 1 to facilitate testing (in isolation)
+    return 1
+  })
+
+  assert.end()
+})
 
 test('thunderJS - call - argument based', assert => {
   resetStubsAndSpies()
@@ -41,7 +56,7 @@ test('thunderJS - call - argument based', assert => {
         method: 'DeviceInfo.1.systeminfo',
       })
     ),
-    'Should make a jsonrpc body with id 1 and method DeviceInfo.1.systeminfo'
+    'Should make a jsonrpc body and method DeviceInfo.1.systeminfo'
   )
 
   assert.deepEquals(
@@ -69,7 +84,7 @@ test('thunderJS - call - object based', assert => {
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 2,
+        id: 1,
         method: 'DeviceInfo.1.systeminfo',
       })
     ),
@@ -80,7 +95,7 @@ test('thunderJS - call - object based', assert => {
     apiRequestSpy.firstCall.args[1],
     {
       jsonrpc: '2.0',
-      id: 2,
+      id: 1,
       method: 'DeviceInfo.1.systeminfo',
     },
     'Should make a request for DeviceInfo.1.systeminfo'
@@ -140,14 +155,14 @@ test('thunderJS - call - argument based - with params', assert => {
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 6,
+        id: 1,
         method: 'Controller.1.activate',
         params: {
           callsign: 'DeviceInfo',
         },
       })
     ),
-    'Should make a jsonrpc body with id 6 and method Controller.1.activate'
+    'Should make a jsonrpc body and method Controller.1.activate'
   )
 
   assert.deepEquals(
@@ -155,7 +170,7 @@ test('thunderJS - call - argument based - with params', assert => {
     {
       jsonrpc: '2.0',
       method: 'Controller.1.activate',
-      id: 6,
+      id: 1,
       params: {
         callsign: 'DeviceInfo',
       },
@@ -181,13 +196,13 @@ test('thunderJS - call - object style - with params', assert => {
       sinon.match({
         jsonrpc: '2.0',
         method: 'Controller.1.activate',
-        id: 7,
+        id: 1,
         params: {
           callsign: 'DeviceInfo',
         },
       })
     ),
-    'Should make a jsonrpc body with id 7 and method Controller.1.activate'
+    'Should make a jsonrpc body and method Controller.1.activate'
   )
 
   assert.deepEquals(
@@ -195,7 +210,7 @@ test('thunderJS - call - object style - with params', assert => {
     {
       jsonrpc: '2.0',
       method: 'Controller.1.activate',
-      id: 7,
+      id: 1,
       params: {
         callsign: 'DeviceInfo',
       },
@@ -218,11 +233,11 @@ test('thunderJS - call - argument based - different plugins in sequence', assert
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 8,
+        id: 1,
         method: 'Controller.1.processinfo',
       })
     ),
-    'Should make a jsonrpc body with id 8 and method Controller.1.processinfo'
+    'Should make a jsonrpc body and method Controller.1.processinfo'
   )
 
   // call DeviceInfo plugin
@@ -232,11 +247,11 @@ test('thunderJS - call - argument based - different plugins in sequence', assert
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 9,
+        id: 1,
         method: 'DeviceInfo.1.systeminfo',
       })
     ),
-    'Should make a jsonrpc body with id 9 and method DeviceInfo.1.systeminfo'
+    'Should make a jsonrpc body and method DeviceInfo.1.systeminfo'
   )
 
   // call Controller plugin with arguments
@@ -246,14 +261,14 @@ test('thunderJS - call - argument based - different plugins in sequence', assert
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 10,
+        id: 1,
         method: 'Controller.1.activate',
         params: {
           callsign: 'DeviceInfo',
         },
       })
     ),
-    'Should make a jsonrpc body with id 9 and method Controller.1.activate and params'
+    'Should make a jsonrpc body and method Controller.1.activate and params'
   )
 
   assert.end()
@@ -271,11 +286,11 @@ test('thunderJS - call - argument based mixed with aobject based', assert => {
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 11,
+        id: 1,
         method: 'Controller.1.processinfo',
       })
     ),
-    'Should make a jsonrpc body with id 11 and method Controller.1.processinfo'
+    'Should make a jsonrpc body and method Controller.1.processinfo'
   )
 
   // call DeviceInfo plugin object based
@@ -285,11 +300,11 @@ test('thunderJS - call - argument based mixed with aobject based', assert => {
     makeBodySpy.returned(
       sinon.match({
         jsonrpc: '2.0',
-        id: 12,
+        id: 1,
         method: 'DeviceInfo.1.systeminfo',
       })
     ),
-    'Should make a jsonrpc body with id 12 and method DeviceInfo.1.systeminfo'
+    'Should make a jsonrpc body and method DeviceInfo.1.systeminfo'
   )
 
   assert.end()
