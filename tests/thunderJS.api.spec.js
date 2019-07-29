@@ -61,3 +61,9 @@ test('thunderJS - api - custom websocket connection', assert => {
 
   assert.end()
 })
+
+test('Teardown - thunderJS - api', assert => {
+  wsStub.restore()
+
+  assert.end()
+})

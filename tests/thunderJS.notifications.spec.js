@@ -1,101 +1,190 @@
-// import test from 'tape'
-// import ThunderJS from '../src/thunderJS'
-// import sinon from 'sinon'
+import test from 'tape'
+import ThunderJS from '../src/thunderJS'
+import sinon from 'sinon'
 
-// const options = { host: 'localhost' }
+import * as API from '../src/api/index'
+import * as connect from '../src/api/connect'
+import { listeners } from '../src/store'
 
-// test('thunderJS - notifications - on-listener', assert => {
-//   let thunderJS = ThunderJS(options)
+const options = { host: 'localhost' }
 
-//   // argument based
-//   const listener1 = thunderJS.on('controller', 'statechange', () => {})
-//   // object based
-//   const listener2 = thunderJS.controller.on('statechange', () => {})
+let makeBodySpy
+let apiRequestSpy
+let connectStub
+let makeIdStub
 
-//   // should return an object
-//   let expected = 'object'
-//   let actual1 = typeof listener1
-//   let actual2 = typeof listener2
+const resetStubsAndSpies = () => {
+  makeIdStub.resetHistory()
+  connectStub.resetHistory()
+  apiRequestSpy.resetHistory()
+  makeBodySpy.resetHistory()
+}
 
-//   assert.equal(
-//     actual1,
-//     expected,
-//     'thunderJS.on should return a listener object (argument based invocation)'
-//   )
-//   assert.equal(
-//     actual2,
-//     expected,
-//     'thunderJS.on should return a listener object (object based invocation)'
-//   )
+test('Setup - thunderJS - calls', assert => {
+  makeBodySpy = sinon.spy(API, 'makeBody')
+  apiRequestSpy = sinon.spy(API, 'execRequest')
 
-//   // should have a dispose method
-//   expected = ['dispose']
-//   actual1 = Object.keys(listener1).filter(key => {
-//     // get the object keys that are a function
-//     return typeof listener1[key] === 'function'
-//   })
-//   actual2 = Object.keys(listener2).filter(key => {
-//     // get the object keys that are a function
-//     return typeof listener2[key] === 'function'
-//   })
-//   assert.deepEqual(
-//     actual1,
-//     expected,
-//     'listener object should have a dispose method  (argument based invocation)'
-//   )
-//   assert.deepEqual(
-//     actual2,
-//     expected,
-//     'listener object should have a dispose method  (object based invocation)'
-//   )
+  connectStub = sinon.stub(connect, 'default').callsFake(() => {
+    return new Promise(resolve => {
+      resolve({
+        // stubbed send
+        send() {},
+      })
+    })
+  })
 
-//   assert.end()
-// })
+  makeIdStub = sinon.stub(API, 'makeId').callsFake(() => {
+    // always return id of 1 to facilitate testing (in isolation)
+    return 1
+  })
 
-// test('thunderJS - notifications - once-listener', assert => {
-//   let thunderJS = ThunderJS(options)
+  assert.end()
+})
 
-//   // argument based
-//   const listener1 = thunderJS.once('controller', 'statechange', () => {})
-//   // object based
-//   const listener2 = thunderJS.controller.once('statechange', () => {})
+// should be able to register a listener argument based
+test('thunderJS - notifications - register a listener argument based', assert => {
+  resetStubsAndSpies()
 
-//   // should return an object
-//   let expected = 'object'
-//   let actual1 = typeof listener1
-//   let actual2 = typeof listener2
+  let thunderJS = ThunderJS(options)
 
-//   assert.equal(
-//     actual1,
-//     expected,
-//     'thunderJS.once should return a listener object (argument based invocation)'
-//   )
-//   assert.equal(
-//     actual2,
-//     expected,
-//     'thunderJS.once should return a listener object (object based invocation)'
-//   )
+  const callback = () => {}
+  thunderJS.on('Controller', 'all', callback)
 
-//   // should have a dispose method
-//   expected = ['dispose']
-//   actual1 = Object.keys(listener1).filter(key => {
-//     // get the object keys that are a function
-//     return typeof listener1[key] === 'function'
-//   })
-//   actual2 = Object.keys(listener2).filter(key => {
-//     // get the object keys that are a function
-//     return typeof listener2[key] === 'function'
-//   })
-//   assert.deepEqual(
-//     actual1,
-//     expected,
-//     'listener object should have a dispose method  (argument based invocation)'
-//   )
-//   assert.deepEqual(
-//     actual2,
-//     expected,
-//     'listener object should have a dispose method  (object based invocation)'
-//   )
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'Controller.1.register',
+        params: {
+          event: 'all',
+        },
+      })
+    ),
+    'Should make a jsonrpc body with method Controller.1.register and params.event all'
+  )
 
-//   assert.end()
-// })
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1].method,
+    'Controller.1.register',
+    'Should make a request for Controller.1.register'
+  )
+
+  // should have a listener registered with the callback (id of listener is client.Controller.events.all)
+  assert.equals(
+    listeners['client.Controller.events.all'][0],
+    callback,
+    'Should have a listener registered with the callback'
+  )
+
+  assert.end()
+})
+
+// should be able to register a listener object based
+test('thunderJS - notifications - register a listener object based', assert => {
+  resetStubsAndSpies()
+  let thunderJS = ThunderJS(options)
+
+  const callback = () => {}
+  thunderJS.WebKitBrowser.on('urlchange', callback)
+
+  assert.ok(
+    makeBodySpy.returned(
+      sinon.match({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'WebKitBrowser.1.register',
+        params: {
+          event: 'urlchange',
+        },
+      })
+    ),
+    'Should make a jsonrpc body with method WebKitBrowser.1.register and params.event urlchange'
+  )
+
+  assert.deepEquals(
+    apiRequestSpy.firstCall.args[1].method,
+    'WebKitBrowser.1.register',
+    'Should make a request for WebKitBrowser.1.register'
+  )
+
+  // should have a listener registered with the callback (id of listener is client.WebKitBrowser.events.urlchange)
+  assert.equals(
+    listeners['client.WebKitBrowser.events.urlchange'][0],
+    callback,
+    'Should have a listener registered with the callback'
+  )
+
+  assert.end()
+})
+
+// should execute callback each time when notification listener is called
+test('thunderJS - notifications - execute callback upon each notification', assert => {
+  resetStubsAndSpies()
+  let thunderJS = ThunderJS(options)
+
+  const callbackSpy = sinon.spy()
+
+  thunderJS.WebKitBrowser.on('visibilitychange', callbackSpy)
+
+  API.notificationListener({
+    method: 'client.WebKitBrowser.events.visibilitychange',
+    params: {
+      hidden: false,
+    },
+  })
+
+  API.notificationListener({
+    method: 'client.WebKitBrowser.events.visibilitychange',
+    params: {
+      hidden: true,
+    },
+  })
+
+  assert.ok(
+    callbackSpy.calledWith({ hidden: false }),
+    'Callback should be called once with hidden false'
+  )
+
+  assert.ok(
+    callbackSpy.calledWith({ hidden: true }),
+    'Callback should be called once with hidden true'
+  )
+
+  assert.ok(callbackSpy.calledTwice, 'Callback should be called twice')
+
+  assert.end()
+})
+
+// should be able to register a more callback for the same listener
+test('thunderJS - notifications - register a mutiple listeners or the same event', assert => {
+  resetStubsAndSpies()
+  let thunderJS = ThunderJS(options)
+
+  const callbackSpy1 = sinon.spy()
+  const callbackSpy2 = sinon.spy()
+
+  thunderJS.WebKitBrowser.on('statechange', callbackSpy1)
+  thunderJS.WebKitBrowser.on('statechange', callbackSpy2)
+
+  API.notificationListener({
+    method: 'client.WebKitBrowser.events.statechange',
+    params: {
+      suspended: false,
+    },
+  })
+
+  assert.ok(callbackSpy1.calledOnce, 'Callback 1 should be called once')
+  assert.ok(callbackSpy2.calledOnce, 'Callback 2 should be called once')
+
+  assert.end()
+})
+
+test('Teardown - thunderJS - calls', assert => {
+  makeBodySpy.restore()
+  apiRequestSpy.restore()
+  connectStub.restore()
+  makeIdStub.restore()
+
+  assert.end()
+})
