@@ -7,7 +7,7 @@ const options = { host: 'localhost' }
 
 const plugin = {
   success() {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       resolve('😎')
     })
   },
@@ -18,7 +18,7 @@ const plugin = {
   },
 }
 
-test('thunderJS - response - promise', assert => {
+test('thunderJS - responses - promise', assert => {
   let thunderJS = ThunderJS(options)
 
   thunderJS.registerPlugin('custom', {
@@ -66,7 +66,7 @@ test('thunderJS - response - promise', assert => {
   assert.end()
 })
 
-test('thunderJS - response - then / catch', assert => {
+test('thunderJS - responses - then / catch', assert => {
   let thunderJS = ThunderJS(options)
 
   const successSpy = sinon.spy()
@@ -93,7 +93,7 @@ test('thunderJS - response - then / catch', assert => {
     })
 })
 
-test('thunderJS - response - passing callback', assert => {
+test('thunderJS - responses - passing callback', assert => {
   let thunderJS = ThunderJS(options)
 
   const callback = () => {}

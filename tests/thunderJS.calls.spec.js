@@ -19,7 +19,7 @@ const resetStubsAndSpies = () => {
   makeBodySpy.resetHistory()
 }
 
-test('Setup - thunderJS - notifications', assert => {
+test('Setup - thunderJS - calls', assert => {
   makeBodySpy = sinon.spy(API, 'makeBody')
   apiRequestSpy = sinon.spy(API, 'execRequest')
 
@@ -40,7 +40,7 @@ test('Setup - thunderJS - notifications', assert => {
   assert.end()
 })
 
-test('thunderJS - notification - argument based', assert => {
+test('thunderJS - calls - argument based', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -72,7 +72,7 @@ test('thunderJS - notification - argument based', assert => {
   assert.end()
 })
 
-test('thunderJS - notification - object based', assert => {
+test('thunderJS - calls - object based', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -104,7 +104,7 @@ test('thunderJS - notification - object based', assert => {
   assert.end()
 })
 
-test('thunderJS - notification - specifying method versions', assert => {
+test('thunderJS - calls - specifying method versions', assert => {
   resetStubsAndSpies()
 
   let config = {
@@ -141,7 +141,7 @@ test('thunderJS - notification - specifying method versions', assert => {
   assert.end()
 })
 
-test('thunderJS - notification - argument based - with params', assert => {
+test('thunderJS - calls - argument based - with params', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -181,7 +181,7 @@ test('thunderJS - notification - argument based - with params', assert => {
   assert.end()
 })
 
-test('thunderJS - notifications - object style - with params', assert => {
+test('thunderJS - calls - object style - with params', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -221,7 +221,7 @@ test('thunderJS - notifications - object style - with params', assert => {
   assert.end()
 })
 
-test('thunderJS - notifications - argument based - different plugins in sequence', assert => {
+test('thunderJS - calls - argument based - different plugins in sequence', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -274,7 +274,7 @@ test('thunderJS - notifications - argument based - different plugins in sequence
   assert.end()
 })
 
-test('thunderJS - notifications - argument based mixed with aobject based', assert => {
+test('thunderJS - calls - argument based mixed with aobject based', assert => {
   resetStubsAndSpies()
 
   let thunderJS = ThunderJS(options)
@@ -310,7 +310,7 @@ test('thunderJS - notifications - argument based mixed with aobject based', asse
   assert.end()
 })
 
-test('Teardown - thunderJS - notifications', assert => {
+test('Teardown - thunderJS - calls', assert => {
   makeBodySpy.restore()
   apiRequestSpy.restore()
   connectStub.restore()

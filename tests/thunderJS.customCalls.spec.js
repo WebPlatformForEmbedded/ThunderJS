@@ -13,7 +13,7 @@ const plugin = {
 const fooSpy = sinon.spy(plugin, 'foo')
 const barSpy = sinon.spy(plugin, 'bar')
 
-test('thunderJS - call - custom plugin - argument based', assert => {
+test('thunderJS - calls - custom plugin - argument based', assert => {
   let thunderJS = ThunderJS(options)
 
   fooSpy.resetHistory()
@@ -31,7 +31,7 @@ test('thunderJS - call - custom plugin - argument based', assert => {
   assert.end()
 })
 
-test('thunderJS - call - custom plugin - object based', assert => {
+test('thunderJS - calls - custom plugin - object based', assert => {
   let thunderJS = ThunderJS(options)
 
   fooSpy.resetHistory()
