@@ -1,6 +1,14 @@
 import { requestsQueue } from '../store'
 
 export default data => {
+  // data = JSON.parse(data)
+  if (typeof data === String) {
+    try {
+      data = JSON.parse(data.normalize())
+    } catch (e) {
+      console.log('Unable to parse data')
+    }
+  }
   if (data.id) {
     const request = requestsQueue[data.id]
     if (request) {

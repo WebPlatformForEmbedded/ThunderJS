@@ -3,6 +3,8 @@ import sinon from 'sinon'
 
 import ThunderJS from '../src/thunderJS'
 
+import { requestQueueResolver, notificationListener } from '../src/api/index'
+
 const options = { host: 'localhost' }
 
 const plugin = {
@@ -117,4 +119,35 @@ test('thunderJS - responses - passing callback', assert => {
     )
     assert.end()
   }, 0)
+})
+
+test('thunderJS - responses - string with illegal characters for json', assert => {
+  const requestQueueResolverSpy = sinon.spy(requestQueueResolver)
+  const notificationListenerSpy = sinon.spy(notificationListener)
+  const message =
+    '{"ssid":"\x00\x00\x00\x00\x00\x00\x00","pairs":[{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967222}'
+
+  try {
+    requestQueueResolverSpy(message)
+  } catch (e) {
+    //
+  }
+
+  assert.notOk(
+    requestQueueResolverSpy.threw(),
+    'requestQueueResolver should not have thrown an error'
+  )
+
+  try {
+    notificationListenerSpy(message)
+  } catch (e) {
+    //
+  }
+
+  assert.notOk(
+    notificationListenerSpy.threw(),
+    'notificationListener should not have thrown an error'
+  )
+
+  assert.end()
 })

@@ -18,10 +18,10 @@ export default options => {
         if (!socket) {
           socket = new WebSocket(makeWebsocketAddress(options), protocols)
           socket.addEventListener('message', message => {
-            requestQueueResolver(JSON.parse(message.data))
+            requestQueueResolver(message.data)
           })
           socket.addEventListener('message', message => {
-            notificationListener(JSON.parse(message.data))
+            notificationListener(message.data)
           })
         }
         socket.addEventListener('open', () => {

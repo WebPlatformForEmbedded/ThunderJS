@@ -64,7 +64,7 @@ function loadUrl(url) {
     })
 }
 
-function getUrl(url) {
+function getUrl() {
   log('Calling: WebKitBrowser.url')
   thunderJS.WebKitBrowser.url()
     .then(function(result) {
