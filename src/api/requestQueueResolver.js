@@ -1,7 +1,7 @@
 import { requestsQueue } from '../store'
 
 export default data => {
-  if (typeof data === String) {
+  if (typeof data === 'string') {
     try {
       data = JSON.parse(data.normalize())
     } catch (e) {
