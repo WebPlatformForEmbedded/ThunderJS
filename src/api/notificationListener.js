@@ -5,7 +5,7 @@ export default data => {
     try {
       data = JSON.parse(data.normalize())
     } catch (e) {
-      console.log('Unable to parse data')
+      //
     }
   }
   // determine if we're dealing with a notification
@@ -16,8 +16,6 @@ export default data => {
       callbacks.forEach(callback => {
         callback(data.params)
       })
-    } else {
-      console.log('no callbacks for ' + data.method)
     }
   }
 }

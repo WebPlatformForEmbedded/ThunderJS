@@ -5,7 +5,7 @@ export default data => {
     try {
       data = JSON.parse(data.normalize())
     } catch (e) {
-      console.log('Unable to parse data')
+      //
     }
   }
   if (data.id) {
