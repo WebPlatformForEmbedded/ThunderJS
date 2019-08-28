@@ -124,11 +124,12 @@ test('thunderJS - responses - passing callback', assert => {
 test('thunderJS - responses - string with illegal characters for json', assert => {
   const requestQueueResolverSpy = sinon.spy(requestQueueResolver)
   const notificationListenerSpy = sinon.spy(notificationListener)
-  const message =
-    '{"ssid":"\x00\x00\x00\x00\x00\x00\x00","pairs":[{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967222}'
+
+  const response =
+    '{"jsonrpc":"2.0","id":24,"result":[{"ssid":"linksys","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2462,"signal":4294967211},{"ssid":"BOESS","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"ESS"}],"frequency":2462,"signal":4294967240},{"ssid":"Sym2018","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2412,"signal":4294967221},{"ssid":"xfinitywifi","pairs":[{"method":"ESS"}],"frequency":2412,"signal":4294967215},{"ssid":"PSPS","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967204},{"ssid":"Orbi","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2447,"signal":4294967225},{"ssid":"","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"ESS"}],"frequency":2447,"signal":4294967223},{"ssid":"HOME-4D65-2.4","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2462,"signal":4294967206},{"ssid":"ATTB8gXyNa","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2412,"signal":4294967256},{"ssid":"NETGEAR37","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967204},{"ssid":"","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"ESS"}],"frequency":2462,"signal":4294967211},{"ssid":"\x00\x00\x00\x00\x00\x00\x00","pairs":[{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967206},{"ssid":"ATT32sNG6J","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2412,"signal":4294967215},{"ssid":"","pairs":[{"method":"ESS"}],"frequency":2422,"signal":4294967207}]}'
 
   try {
-    requestQueueResolverSpy(message)
+    requestQueueResolverSpy(response)
   } catch (e) {
     //
   }
@@ -139,7 +140,7 @@ test('thunderJS - responses - string with illegal characters for json', assert =
   )
 
   try {
-    notificationListenerSpy(message)
+    notificationListenerSpy(response)
   } catch (e) {
     //
   }

@@ -2,11 +2,7 @@ import { listeners } from '../store'
 
 export default data => {
   if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data.normalize().replace(/\\x([0-9A-Fa-f]{2})/g, ''))
-    } catch (e) {
-      console.log('Unable to parse data')
-    }
+    data = JSON.parse(data.normalize().replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, ''))
   }
   // determine if we're dealing with a notification
   if (!data.id && data.method) {
