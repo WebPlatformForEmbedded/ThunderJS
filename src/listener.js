@@ -10,7 +10,6 @@ export default function(plugin, event, callback) {
     dispose() {
       const listener_id = makeListenerId(plugin, event)
       listeners[listener_id].splice(index, 1)
-
       if (listeners[listener_id].length === 0) {
         unregister.call(thunder, plugin, event)
       }
@@ -31,9 +30,7 @@ const register = function(plugin, event, callback) {
     // create an array to store this plugin/event's callback(s)
     listeners[listener_id] = []
 
-    // ThunderJS as a plugin means it's an internal event, so no need to make an API call
     if (plugin !== 'ThunderJS') {
-      // request the server to send us notifications for this event
       const method = 'register'
 
       // remove 'event' from the listener_id to send as request id
@@ -46,8 +43,7 @@ const register = function(plugin, event, callback) {
         event,
         id: request_id,
       }
-      this.api
-        .request(plugin, method, params)
+      this.call(plugin, method, params)
         .then()
         .catch()
     }
@@ -80,6 +76,8 @@ const unregister = function(plugin, event) {
       event,
       id: request_id,
     }
-    this.api.request(plugin, method, params)
+    this.call(plugin, method, params)
+      .then()
+      .catch()
   }
 }

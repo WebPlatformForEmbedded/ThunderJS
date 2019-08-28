@@ -17,28 +17,31 @@ export default options => {
       try {
         if (!socket) {
           socket = new WebSocket(makeWebsocketAddress(options), protocols)
+
           socket.addEventListener('message', message => {
             requestQueueResolver(message.data)
           })
+
           socket.addEventListener('message', message => {
             notificationListener(message.data)
           })
-        }
-        socket.addEventListener('open', () => {
-          notificationListener({
-            method: 'client.ThunderJS.events.connect',
-          })
-          connection = socket
-          resolve(connection)
-        })
 
-        socket.addEventListener('close', () => {
-          notificationListener({
-            method: 'client.ThunderJS.events.disconnect',
+          socket.addEventListener('open', () => {
+            notificationListener({
+              method: 'client.ThunderJS.events.connect',
+            })
+            connection = socket
+            resolve(connection)
           })
-          socket = null
-          connection = null
-        })
+
+          socket.addEventListener('close', () => {
+            notificationListener({
+              method: 'client.ThunderJS.events.disconnect',
+            })
+            socket = null
+            connection = null
+          })
+        }
       } catch (e) {
         reject(e)
       }
