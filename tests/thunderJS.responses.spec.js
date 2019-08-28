@@ -124,11 +124,12 @@ test('thunderJS - responses - passing callback', assert => {
 test('thunderJS - responses - string with illegal characters for json', assert => {
   const requestQueueResolverSpy = sinon.spy(requestQueueResolver)
   const notificationListenerSpy = sinon.spy(notificationListener)
-  const message =
-    '{"ssid":"\x00\x00\x00\x00\x00\x00\x00","pairs":[{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967222}'
+
+  const response =
+    '{"jsonrpc":"2.0","id":2,"result":[{"ssid":"MARIRO","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2417,"signal":4294967254},{"ssid":"MARIRO-5GHz","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5785,"signal":4294967229},{"ssid":"RODRIGO_2G","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2412,"signal":4294967250},{"ssid":"RODRIGO_5G","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5200,"signal":4294967245},{"ssid":"LUCIANO","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5805,"signal":4294967211},{"ssid":"#NET-CLARO-WIFI","pairs":[{"method":"ESS"}],"frequency":2412,"signal":4294967251},{"ssid":"NET_5G546318","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5745,"signal":4294967208},{"ssid":"MARIRO","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967223},{"ssid":"Tibernet","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"ESS"}],"frequency":5745,"signal":4294967213},{"ssid":"\xf0\x9f\x92\xa9\xf0\x9f\x98\x9c","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2462,"signal":4294967256},{"ssid":"\xf0\x9f\x9a\x80\xf0\x9f\x9a\x80\xf0\x9f\x9a\x80\xf0\x9f\x9a\x80","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5520,"signal":4294967267},{"ssid":"\xf0\x9f\x92\xa9\xf0\x9f\x98\x9c","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5520,"signal":4294967267},{"ssid":"Lucia","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5240,"signal":4294967221},{"ssid":"Lucia","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967235},{"ssid":"Lucia5G","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5240,"signal":4294967220},{"ssid":"2.4G ap172","pairs":[{"method":"WPA","keys":["PSK","CCMP"]},{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2462,"signal":4294967233},{"ssid":"#NET-CLARO-WIFI","pairs":[{"method":"WPS"},{"method":"ESS"}],"frequency":2462,"signal":4294967233},{"ssid":"KEVIN","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":2437,"signal":4294967237},{"ssid":"KEVIN-5G","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5745,"signal":4294967222},{"ssid":"DIRECT-","pairs":[{"method":"WEP"}],"frequency":2462,"signal":4294967241},{"ssid":"WiFi_Home","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"ESS"}],"frequency":5745,"signal":4294967211},{"ssid":"WiFi_Home-guest","pairs":[{"method":"WPA2","keys":["PSK","CCMP"]},{"method":"ESS"}],"frequency":5745,"signal":4294967208},{"ssid":"NETVIRTUA151_5G","pairs":[{"method":"WPA","keys":["PSK","CCMP","TKIP"]},{"method":"WPA2","keys":["PSK","CCMP","TKIP"]},{"method":"WPS"},{"method":"ESS"}],"frequency":5240,"signal":4294967207}]}'
 
   try {
-    requestQueueResolverSpy(message)
+    requestQueueResolverSpy(response)
   } catch (e) {
     //
   }
@@ -139,7 +140,7 @@ test('thunderJS - responses - string with illegal characters for json', assert =
   )
 
   try {
-    notificationListenerSpy(message)
+    notificationListenerSpy(response)
   } catch (e) {
     //
   }

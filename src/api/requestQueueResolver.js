@@ -2,11 +2,7 @@ import { requestsQueue } from '../store'
 
 export default data => {
   if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data.normalize())
-    } catch (e) {
-      console.log('Unable to parse data')
-    }
+    data = JSON.parse(data.normalize().replace(/\\x([0-9A-Fa-f]{2})/g, ''))
   }
   if (data.id) {
     const request = requestsQueue[data.id]
